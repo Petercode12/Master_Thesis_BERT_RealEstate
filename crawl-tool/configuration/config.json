@@ -1,0 +1,21 @@
+{
+    "mongo": {
+        "user": "admin",
+        "password": "admin",
+        "host": "crawler-mongo",    
+        "port": 27017,
+        "database": "ttndung"
+    },
+    "postgres": {
+        "user": "admin",
+        "password": "admin",
+        "host": "crawler-postgres",
+        "port": 5432,
+        "database": "ttndung"
+    },
+    "virtual_env_dir": "/venv/bin/activate",
+    "facebook_group_file_prefix": "groups/groups_facebook_",
+    "facebook_profile_prefix": "profiles/facebook_profile_",
+    "facebook_cookie_prefix": "cookies/cookie_",
+    "splash_timeout": 60
+}

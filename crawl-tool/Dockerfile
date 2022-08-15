@@ -18,22 +18,25 @@
 # CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
 
 # syntax=docker/dockerfile:1
+# 1
 FROM ubuntu:18.04
 
 # Install machine dependencies
+# 2
 RUN apt update \
   && apt install -y unzip curl wget git make build-essential g++ openjdk-8-jdk 
 # RUN apt update \
 #   && apt-get install fonts-liberation libgbm1 libgtk-4-1 libxkbcommon0 xdg-utils
-
+# 3
 RUN apt update \
   && echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | tee /etc/apt/sources.list.d/google-chrome.list \
   && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
   && apt update \
   && apt install -y google-chrome-stable
 ENV CHROMEDRIVER_DIR /chromedriver
+# 4
 RUN mkdir $CHROMEDRIVER_DIR
-
+# 5
 RUN apt-get install -y google-chrome-stable && \
     CHROMEVER=$(google-chrome --product-version | grep -o "[^\.]*\.[^\.]*\.[^\.]*") && \
     DRIVERVER=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROMEVER") && \
@@ -41,11 +44,13 @@ RUN apt-get install -y google-chrome-stable && \
     unzip $CHROMEDRIVER_DIR/chromedriver* -d $CHROMEDRIVER_DIR
 ENV PATH $CHROMEDRIVER_DIR:$PATH
 
+# 6
 RUN apt-get update\
     && apt-get install cron\
     && service cron start\
     && echo "PATH=/opt/someApp/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/chromedriver\n0 17 * * * DISPLAY=:0 . /code/jobs/management/commands/test.sh " | crontab -
 
+# 7
 RUN apt-get update && \
   apt-get install -y \
     libgtk2.0-0 \
@@ -62,12 +67,12 @@ RUN apt install -y python3.8 python3-pip python3-setuptools
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /code
-COPY requirements.txt requirements.txt
+COPY crawl-tool/requirements.txt requirements.txt
 RUN python3.8 -m pip install --upgrade pip
 RUN python3.8 -m pip install virtualenv
 RUN virtualenv /opt/env
 RUN . /opt/env/bin/activate && python3.8 -m pip install -r requirements.txt
-COPY . .
+COPY crawl-tool/* .
 RUN . /opt/env/bin/activate && python3.8 manage.py makemigrations
 
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
