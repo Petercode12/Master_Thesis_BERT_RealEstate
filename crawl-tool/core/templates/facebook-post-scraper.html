@@ -1,0 +1,921 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+    <style>
+        td.details-control {
+            background: url('/static/assets/img/team/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.details td.details-control {
+            background: url('/static/assets/img/team/details_close.png') no-repeat center center;
+        }
+    </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Facebook Post Scraper</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Facebook Post Scraper</h1>
+                  <p class="mb-0">Nhập danh sách nhóm facebook cần quét và lấy toàn bộ thông tin bài viết.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#fbp" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Facebook Post Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-4" id="check-facebook">
+                    <div class="col-xl-4">
+                        <div class="mb-4">
+                            <label for="text">Danh Sách</label>
+                            <textarea class="form-control" placeholder="Ví dụ (Mỗi link cách nhau bằng dấu phẩy):&#10;https://m.facebook.com/groups/1065116420221723,https://m.facebook.com/groups/mogivietnam/" id="group_list" rows="4">{{ group_list }}</textarea>
+                            <small id="textHelp" class="form-text text-muted">Nhập danh sách nhóm facebook cần quét.</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2">
+                        <div class="mb-4">
+                            <label for="number">Số Lượng Scroll</label>
+                            <input type="number" class="form-control" id="scrolls" placeholder="Ví dụ: 2" aria-describedby="textHelp">
+                            <small id="numberHelp" class="form-text text-muted">Nhập số lượng Scroll.</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                        <button id="trigger-button" onclick="crawlFacebookPost($('#group_list').val(),$('#scrolls').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+                    </div>
+                </div>
+            </div>
+      </div>
+      
+
+        <div class="card border-light shadow-sm mb-4">
+            <div style="padding: 20px 0px 20px 20px">
+                <h2 class="h4">Posts With Most Reactions</h2>
+                <div class="likes-chart"></div>      
+                <h2 style="padding-top: 40px" class="h4">Posts With Most Comments</h2>
+                <div class="comments-chart"></div>
+                <!-- <br>
+                <iframe src="http://localhost:8501/" style="width: 100%; height: 60rem;"></iframe> -->
+            </div>
+        </div>
+
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive" id="table-wrapper">
+                <table id="data" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>ID Nhóm Facebook</th>
+                            <th>ID Bài Đăng</th>
+                            <th>ID Người Đăng</th>
+                            <th>Nội Dung</th>
+                            <th>Ảnh Liên Kết</th>
+                            <th>Chú Thích</th>
+                            <th>Số Lươt Thích</th>
+                            <th>Số Bình Luận</th>
+                            <th>Số Lươt Chia Sẻ</th>
+                            <th>Thời Gian Đăng</th>
+                            <th>Ngày Khởi Tạo</th>
+                            <th>Ngày Cập Nhật</th>
+                        </tr>
+                    </thead>
+                </table>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive" id="table-wrapper">
+              <table id="data-user" class="display" style="width:100%;">
+                  <thead>
+                      <tr>
+                          <th></th>
+                          <th></th>
+                          <th>Số Thứ Tự</th>
+                          <th>ID Người Dùng</th>
+                          <th>ID Nhóm Facebook</th>
+                          
+                          <th>Tên Người Dùng</th>
+                          <th>Công Việc</th>
+                          <th>Học Vấn</th>
+                          <th>Số Bạn</th>
+                          <th>Số Follower</th>
+                          <th>Số Người Đang Theo Dõi</th>
+                          <th>Ngày Khởi Tạo</th>
+                          <th>Ngày Cập Nhật</th>
+                      </tr>
+                  </thead>
+              </table>
+            </div>
+        </div>
+    </div>
+
+      <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a  href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a> 
+                        - edited by <a target="_blank" href="https://www.linkedin.com/in/thiện-huỳnh-ngọc-8481b6194">Huỳnh Ngọc Thiện</a>
+                    </p>
+                </div>
+
+                <div class="col-12 col-lg-6 text-right">
+                    
+                    <a id="trigger-button" target="_blank" href="/facebook-comment-scraper" class="btn btn-md btn-info" style="" type="button">Thống kê bình luận</a>
+
+                    <a id="trigger-button" target="_blank" href="/facebook-user-scraper" class="btn btn-md btn-tertiary" style="" type="button">Thống kê tài khoản</a>
+
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+        
+        currentTimestamp = parseInt(moment().unix());
+        theInterval = null;
+
+        function drawChart(){
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-post-chart/',
+                success: function (response) {
+
+                    console.log(response)
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Cập nhật biểu đồ thành công !!!'
+                    });
+
+                    var options = {
+                        distributeSeries: true,
+                        height: 300
+                    };
+
+                    let likes = response.likes
+                    let comments = response.comments
+
+                    let labels = []
+                    let series = []
+
+                    for (let i = 0; i < likes.length; i++){
+                        labels.push( "Group: " + likes[i]["group_id"] + "\n Post: " + likes[i]["post_id"] )
+                        series.push( likes[i]["post_total_reactions"] )
+                    }
+                    
+                    new Chartist.Bar('.likes-chart', {
+                        labels: labels,
+                        series: series
+                        }, options);
+
+                    labels = []
+                    series = []
+
+                    for (let i = 0; i < comments.length; i++){
+                        labels.push( "Group: " + comments[i]["group_id"] + "\n Post: " + comments[i]["post_id"] )
+                        series.push( comments[i]["post_total_comments"] )
+                    }
+
+                    new Chartist.Bar('.comments-chart', {
+                        labels: labels,
+                        series: series
+                        }, options);
+
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Biều đồ đã có lỗi xảy ra !!!'
+                    });
+                    
+                },
+            });
+
+        }
+
+        function deleteDatatableRecords(){
+
+            id_array = [];
+
+            $( ".odd" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $( ".even" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-post-delete-data/',
+                data: {
+                    "id_array": id_array.join(','),
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã xóa thành công !!!'
+                    });
+                    
+                    $('#data').DataTable().clear().draw();
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Xóa thất bại hoặc bạn chưa chọn dữ liệu để xóa !!!'
+                    });
+                    
+                },
+            });
+        }
+
+        function refreshDatatable(){
+            $('.table-responsive').toggle();
+        }
+
+        function changeToClientSide(){
+            $('#data').DataTable().destroy();
+            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>');
+            $('#data').DataTable({
+                bInfo : false,
+                serverSide: false,
+                searching: false,
+                paging: false,
+                destroy: true,
+                bSort: false,
+                dom: 'Bfrtip',
+                buttons:[
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    {
+                        text: "Tắt Tự Động Cập Nhật",
+                        className: 'btn-danger',
+                        action: function (e, dt, node, config) {
+                            clearInterval(theInterval);
+                            $('#data').DataTable().destroy();
+                            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>')
+                            changeToServerSide();
+                        },
+                    },
+                ]
+            });
+            $('#data').DataTable().clear().draw();
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-primary');
+            }, 100);
+
+            theInterval = setInterval(function(){ 
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/facebook-post-auto-data/',
+                    data: {
+                        "timestamp": parseInt(currentTimestamp)
+                    },
+                    success: function (response) {
+
+                        $('#data').DataTable().clear().draw();
+
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'success',
+                                    background: '#1b998b',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+                        
+                        // notyf.open({
+                        //     type: 'success',
+                        //     message: 'Có dữ liệu mới !!!'
+                        // });
+
+                        for (i = 0; i < response.data.length; i++) {
+                            $('#data').dataTable().fnAddData([
+                                '',
+                                response.data[i]["id"],
+                                response.data[i]["group_id"],
+                                response.data[i]["post_id"],
+                                response.data[i]["post_user_id"],
+                                response.data[i]["post_message"],
+                                response.data[i]["post_image_link"],
+                                response.data[i]["post_image_alt"],
+                                response.data[i]["post_total_reactions"],
+                                response.data[i]["post_total_comments"],
+                                response.data[i]["post_total_shares"],
+                                moment.unix(response.data[i]["timestamp"]).format("DD/MM/YYYY HH:mm:ss"),
+                                moment.unix(response.data[i]["created_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                                moment.unix(response.data[i]["updated_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                            ]);
+                        }
+
+                        $('#data').DataTable().order([1, 'asc']).draw();
+                        $('#data').DataTable().order([0, 'asc']).draw();
+                        
+                        // $('#data').DataTable().clear().draw();
+                    },
+                    error: (xhr) => {
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'error',
+                                    background: '#FA5151',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+
+                        notyf.open({
+                            type: 'error',
+                            message: 'Kết nối thất bại !!!'
+                        });
+                        
+                    },
+                });
+
+            }, 5000);
+
+        }
+
+        function changeToServerSide(){
+            var dt = $('#data').DataTable({
+                bInfo : false,
+                serverSide: true,
+                destroy: true,
+                order: [[ 4, "desc" ]],
+                search: {
+                    search: " "
+                },
+                sAjaxSource: "/facebook-post-show-data/",  // new url
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: 0,
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        },
+                        {
+                            targets: 6,
+                            width: "20000px",
+                        }
+                    ],
+                    columns: [
+                        {name: "checkbox", data: 0},
+                        {
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
+                        },
+                        {name: "id", data: 0},
+                        {name: "group_id", data: 1},
+                        {name: "post_id", data: 2},
+                        {name: "post_user_id", data: 3},
+                        {name: "post_messsage", data: 4},
+                        {name: "post_image_link", data: 5},
+                        {name: "post_image_alt", data: 6},
+                        {name: "post_total_reactions", data: 7},
+                        {name: "post_total_comments", data: 8},
+                        {name: "post_total_shares", data: 9},
+                        {name: "timestamp", data: 10, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "created_at", data: 11, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "updated_at", data: 12, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                refreshDatatable();
+                                dt.ajax.reload(null, true);
+                                setTimeout(function(){
+                                    refreshDatatable()
+                                }, 100);
+                            },
+                        },
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        {
+                            text: "Tự Động Cập Nhật",
+                            className: 'btn-warning',
+                            action: function (e, dt, node, config) {
+                                changeToClientSide();
+                            },
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: '',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ]
+            });
+
+            var dt = $('#data-user').DataTable({
+                bInfo : false,
+                serverSide: true,
+                destroy: true,
+                order: [[ 4, "desc" ]],
+                search: {
+                    search: " "
+                },
+                sAjaxSource: "/facebook_user_from_group-show-data/",  // new url
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: 0,
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        },
+                        {
+                            targets: 6,
+                            width: "20000px",
+                        }
+                    ],
+                    columns: [
+                        {name: "checkbox", data: 0},
+                        {
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
+                        },
+                        {name: "id", data: 0},
+                        {name: "user_id", data: 1},
+                        {name: "group_id", data: 2},
+                        {name: "name", data: 3},
+                        {name: "work", data: 4},
+                        {name: "education", data: 6},
+                        {name: "friend_count", data: 7},
+                        {name: "followers_count", data: 8},
+                        {name: "following_count", data: 9},
+                        {name: "created_at", data: 10, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "updated_at", data: 11, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                refreshDatatable();
+                                dt.ajax.reload(null, true);
+                                setTimeout(function(){
+                                    refreshDatatable()
+                                }, 100);
+                            },
+                        },
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        {
+                            text: "Tự Động Cập Nhật",
+                            className: 'btn-warning',
+                            action: function (e, dt, node, config) {
+                                changeToClientSide();
+                            },
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: '',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ]
+            });
+
+            // Array to track the ids of the details displayed rows
+            var detailRows = [];
+            
+            $('#data tbody').on( 'click', 'tr td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = dt.row( tr );
+                var idx = $.inArray( tr.attr('id'), detailRows );
+
+                if ( row.child.isShown() ) {
+                    tr.removeClass( 'details' );
+                    row.child.hide();
+
+                    // Remove from the 'open' array
+                    detailRows.splice( idx, 1 );
+                }
+                else {
+
+                    console.log( row.data() )
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/facebook-post-get-comments/',
+                        data: {
+                            "post_id": row.data()[2],
+                        },
+                        success: function (response) {
+
+                            const notyf = new Notyf({
+                                position: {
+                                    x: 'right',
+                                    y: 'top',
+                                },
+                                ripple: true,
+                                types: [
+                                    {
+                                        type: 'success',
+                                        background: '#1b998b',
+                                        icon: {
+                                            className: '',
+                                            tagName: 'span',
+                                            color: '#fff'
+                                        },
+                                        dismissible: true,
+                                    }
+                                ]
+                            });
+                            
+                            notyf.open({
+                                type: 'success',
+                                message: 'Đã tải bình luận thành công !!!'
+                            });
+                            
+                            console.log(response)
+
+                            let comments = response.comments;
+
+                            let htmls = ''
+
+                            for (let i = 0; i < comments.length; i++){
+                                console.log(comments[i][3])
+                                if (comments[i][3] == null){
+                                    htmls = htmls + '<h4><a href="https://facebook.com/' + comments[i][1] + '">' + comments[i][0] + '</a> bình luận:</h4><p>' + comments[i][2] + '</p>'
+                                }
+                                else{
+                                    for (let j = i + 1; j < comments.length; j++){
+                                        if (comments[i][3] = comments[j][3]){
+                                            htmls = htmls + '<h4><a href="https://facebook.com/' + comments[i][1] + '">' + comments[i][0] + '</a> trả lời bình luận của <a href="https://facebook.com/' + comments[j][1] + '">' + comments[j][0] + '</a>:</h4><p>' + comments[i][2] + '</p>'
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+
+                            tr.addClass( 'details' );
+                            row.child( $(htmls) ).show();
+                            
+                            /*
+                            finalResults = JSON.parse(row.data()[9].replaceAll('"','$$&$$').replaceAll("'",'"').replaceAll("None", null).replaceAll('$$&$$',"'"));
+
+                            $('#json-viewer-' + row.data()[0]).jsonViewer(finalResults, {
+                                collapsed: true
+                            });
+                            */
+
+                            // Add to the 'open' array
+                            if ( idx === -1 ) {
+                                detailRows.push( tr.attr('id') );
+                            }
+
+                        },
+                        error: (xhr) => {
+                            const notyf = new Notyf({
+                                position: {
+                                    x: 'right',
+                                    y: 'top',
+                                },
+                                ripple: true,
+                                types: [
+                                    {
+                                        type: 'error',
+                                        background: '#FA5151',
+                                        icon: {
+                                            className: '',
+                                            tagName: 'span',
+                                            color: '#fff'
+                                        },
+                                        dismissible: true,
+                                    }
+                                ]
+                            });
+
+                            notyf.open({
+                                type: 'error',
+                                message: 'Tải bình luận thất bại hoặc không có !!!'
+                            });
+                            
+                        },
+                    });
+
+                }
+            } );
+
+            // On each draw, loop over the `detailRows` array and show any child rows
+            dt.on( 'draw', function () {
+                $.each( detailRows, function ( i, id ) {
+                    $('#'+id+' td.details-control').trigger( 'click' );
+                } );
+            } );
+
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+
+        }
+
+        $(document).ready(function () {
+            changeToServerSide()
+            drawChart()
+        });
+
+    function crawlFacebookPost(group_list,scrolls){
+
+        if (group_list == '' || scrolls == ''){
+
+            const notyf = new Notyf({
+                    position: {
+                        x: 'right',
+                        y: 'top',
+                    },
+                    ripple: true,
+                    types: [
+                        {
+                            type: 'error',
+                            background: '#FA5151',
+                            icon: {
+                                className: '',
+                                tagName: 'span',
+                                color: '#fff'
+                            },
+                            dismissible: true,
+                        }
+                    ]
+                });
+                notyf.open({
+                    type: 'error',
+                    message: 'Vui lòng nhập đầy đủ thông số tìm kiếm !!!'
+                });
+                $("#trigger-button").attr("disabled", false);
+                $("#trigger-button").html('Quét Dữ Liệu');
+
+        }
+
+        else{
+
+            $("#trigger-button").attr("disabled", true);
+
+            $("#trigger-button").html('<i class="fas fa-sync fa-spin"></i>');
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-post-get-data/',
+                data: {
+                    "group_list": group_list,
+                    "scrolls": scrolls
+                },
+                success: function (response) {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã gửi lệnh quét thành công. Xin tải lại bảng dữ liệu hoặc bật chế độ thời gian thực để kiểm tra dữ liệu đang được quét'
+                    });
+
+                    setTimeout(function(){
+                        $("#trigger-button").attr("disabled", false);
+                        $("#trigger-button").html('Quét Dữ Liệu');
+                    }, 5000);
+
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'error',
+                        message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                    });
+                    $("#trigger-button").attr("disabled", false);
+                    $("#trigger-button").html('Quét Dữ Liệu');
+                },
+            });
+
+        }
+
+    }
+
+    </script>
+
+    <script src="/static/assets/js/jquery.json-viewer.js"></script>
+    
+{% endblock javascripts %}

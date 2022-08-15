@@ -1,0 +1,404 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" href="../static/assets/css/ll.css">
+{% endblock stylesheets %}
+<meta charset="utf-8">
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Bình Dương Real Estate Scraper</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Bình Dương Real Estate Scraper</h1>
+                  <p class="mb-0">Nhập số trang để quét dữ liệu của website tương ứng</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#vieclamtot" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Bình Dương Real Estate Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-xl-4">
+                        <div class="mb-4">
+                        <img style="margin-top:1.5rem" src="https://ancu.me/img/logo.svg"
+                                alt="Binh Duong Real Estate Scraper" class="img-fluid" width="300" height="200">
+                        </div>
+                    </div>
+                    <div class="col-xl-2">
+                        <div class="mb-4">
+                            <label for="text">Số Trang</label>
+                            <input type="text" class="form-control" id="end_page_ancu" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                            <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                        <button id="trigger-button" onclick="crawlAnCu($('#end_page_ancu').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+                    </div>
+                </div>
+            </div>
+      </div>
+
+
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive">
+                <p>
+                <label for="text">Hiển Thị Mô Tả</label>: 
+                    <button onclick="change(0)"  class="toggle-vis" data-column="5" value="Close">Tắt</button>  
+                    <label for="text">Hiển Thị Địa Chỉ</label>: 
+                    <button onclick="change(1)"  class="toggle-vis" data-column="8" value="Close">Tắt</button>  
+                </p>
+                <table id="dataAnCu" class="display" style="width:auto;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>Thời Gian Đăng Bài</th>
+                            <th>Tiêu Đề</th>
+                            <th>Loại BDS</th>
+                            <th>Mô Tả</th>
+                            <th>Diện Tích</th>
+                            <th>Giá</th>
+                            <th>Địa Chỉ Cụ Thể</th>
+                            <th>Bản Đồ</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Người Đăng Bài</th>
+                            <th>Số Điện Thoại</th>
+                            <!-- <th>Thời Gian Tạo</th> -->
+                            
+                        </tr>
+                    </thead>
+		    
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>Thời Gian Đăng Bài</th>
+                            <th>Tiêu Đề</th>
+                            <th>Loại BDS</th>
+                            <th>Mô Tả</th>
+                            <th>Diện Tích</th>
+                            <th>Giá</th>
+                            <th>Địa Chỉ Cụ Thể</th>
+                            <th>Bản Đồ</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Người Đăng Bài</th>
+                            <th>Số Điện Thoại</th>
+                        </tr>
+                    </tfoot>
+		   
+                </table>
+                <br>
+                
+              </div>
+          </div>
+      </div>
+      <br>
+      
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-xl-4">
+                    <div class="mb-4">
+                    <img style="margin-top:1.5rem" src="https://muaban.net/logo/muaban.svg"
+                            alt="Binh Duong Real Estate Scraper" class="img-fluid" width="300" height="200">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="text">Số Trang</label>
+                        <input type="text" class="form-control" id="end_page_muaban" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                        <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét</small>
+                    </div>
+                </div>
+                <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                    <button id="trigger-button" onclick="crawlMuaBan($('#end_page_muaban').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+                </div>
+            </div>
+        </div>
+  </div>
+
+
+  <div class="card border-light shadow-sm">
+      <div class="card-body">
+          <div class="table-responsive">
+            <!-- <p>
+            <label for="text">Hiển Thị Mô Tả</label>: 
+                <button onclick="change(0)"  class="toggle-vis" data-column="5" value="Close">Tắt</button>  
+                <label for="text">Hiển Thị Địa Chỉ</label>: 
+                <button onclick="change(1)"  class="toggle-vis" data-column="8" value="Close">Tắt</button>  
+            </p> -->
+            <table id="dataMuaBan" class="display" style="width:auto;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Số Thứ Tự</th>
+                        <th>Thời Gian Đăng Bài</th>
+                        <th>Tiêu Đề</th>
+                        <th>Loại BDS</th>
+                        <th>Mô Tả</th>
+                        <th>Diện Tích</th>
+                        <th>Phòng Ngủ</th>
+                        <th>Phòng Tắm</th>
+                        <th>Tầng</th>
+                        <th>Giấy Tờ Pháp Lý</th>
+                        <th>Giá</th>
+                        <th>Địa Chỉ Cụ Thể</th>
+                        <th>Bản Đồ</th>
+                        <th>Đường Liên Kết</th>
+                        <th>Người Đăng Bài</th>
+                        <th>Số Điện Thoại</th>
+                        
+                    </tr>
+                </thead>
+        
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th>Số Thứ Tự</th>
+                        <th>Thời Gian Đăng Bài</th>
+                        <th>Tiêu Đề</th>
+                        <th>Loại BDS</th>
+                        <th>Mô Tả</th>
+                        <th>Diện Tích</th>
+                        <th>Phòng Ngủ</th>
+                        <th>Phòng Tắm</th>
+                        <th>Tầng</th>
+                        <th>Giấy Tờ Pháp Lý</th>
+                        <th>Giá</th>
+                        <th>Địa Chỉ Cụ Thể</th>
+                        <th>Bản Đồ</th>
+                        <th>Đường Liên Kết</th>
+                        <th>Người Đăng Bài</th>
+                        <th>Số Điện Thoại</th>
+                    </tr>
+                </tfoot>
+       
+            </table>
+            <br>
+            
+          </div>
+      </div>
+  </div>
+  <br>
+  
+  <div class="card border-light shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-xl-4">
+                <div class="mb-4">
+                <img style="margin-top:1.5rem" src="https://dangbannhadat.vn/style/images/logo.png"
+                        alt="Binh Duong Real Estate Scraper" width="300" height="100">
+                </div>
+            </div>
+            <div class="col-xl-2">
+                <div class="mb-4">
+                    <label for="text">Số Trang</label>
+                    <input type="text" class="form-control" id="end_page_dangbannhadat" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                    <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét</small>
+                </div>
+            </div>
+            <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                <button id="trigger-button" onclick="crawlDangBanNhaDat($('#end_page_dangbannhadat').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card border-light shadow-sm">
+  <div class="card-body">
+      <div class="table-responsive">
+
+        <table id="dataDangBanNhaDat" class="display" style="width:auto;">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Số Thứ Tự</th>
+                    <th>Thời Gian Đăng Bài</th>
+                    <th>Tiêu Đề</th>
+                    <th>Loại BDS</th>
+                    <th>Mô Tả</th>
+                    <th>Diện Tích</th>
+                    <th>Giá</th>
+                    <th>Địa Chỉ Cụ Thể</th>
+                    <th>Đường Liên Kết</th>
+                    <th>Người Đăng Bài</th>
+                    <th>Số Điện Thoại</th>
+                    
+                </tr>
+            </thead>
+    
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Số Thứ Tự</th>
+                    <th>Thời Gian Đăng Bài</th>
+                    <th>Tiêu Đề</th>
+                    <th>Loại BDS</th>
+                    <th>Mô Tả</th>
+                    <th>Diện Tích</th>
+                    <th>Giá</th>
+                    <th>Địa Chỉ Cụ Thể</th>
+                    <th>Đường Liên Kết</th>
+                    <th>Người Đăng Bài</th>
+                    <th>Số Điện Thoại</th>
+                </tr>
+            </tfoot>
+   
+        </table>
+        <br>
+        
+      </div>
+  </div>
+</div>
+<br>
+
+<div class="card border-light shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-xl-4">
+                <div class="mb-4">
+                <img style="margin-top:1.5rem" src="https://nhadat24h.net/Images/logo.png"
+                        alt="Binh Duong Real Estate Scraper" width="100" height="100">
+                </div>
+            </div>
+            <div class="col-xl-2">
+                <div class="mb-4">
+                    <label for="text">Số Trang</label>
+                    <input type="text" class="form-control" id="end_page_nhadat24h" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                    <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét</small>
+                </div>
+            </div>
+            <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                <button id="trigger-button" onclick="crawlNhaDat24h($('#end_page_nhadat24h').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card border-light shadow-sm">
+  <div class="card-body">
+      <div class="table-responsive">
+        <p>
+        <label for="text">Hiển Thị Mô Tả</label>: 
+            <button onclick="change1(0)"  class="toggle-vis-nhadat24h" data-column="4" value="Close">Tắt</button>  
+            <label for="text">Hiển Thị Địa Chỉ</label>: 
+            <button onclick="change1(1)"  class="toggle-vis-nhadat24h" data-column="11" value="Close">Tắt</button>  
+        </p>
+        <table id="dataNhaDat24h" class="display" style="width:auto;">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Số Thứ Tự</th>
+                    <th>Tiêu Đề</th>
+                    <th>Loại BDS</th>
+                    <th>Mô Tả</th>
+                    <th>Diện Tích</th>
+                    <th>Phòng Ngủ</th>
+                    <th>Phòng Tắm</th>
+                    <th>Tầng</th>
+                    <th>Giấy Tờ Pháp Lý</th>
+                    <th>Giá</th>
+                    <th>Địa Chỉ Cụ Thể</th>
+                    <th>Đường Liên Kết</th>
+                    <th>Người Đăng Bài</th>
+                    <th>Số Điện Thoại</th>
+                    
+                </tr>
+            </thead>
+    
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Số Thứ Tự</th>
+                    <th>Tiêu Đề</th>
+                    <th>Loại BDS</th>
+                    <th>Mô Tả</th>
+                    <th>Diện Tích</th>
+                    <th>Phòng Ngủ</th>
+                    <th>Phòng Tắm</th>
+                    <th>Tầng</th>
+                    <th>Giấy Tờ Pháp Lý</th>
+                    <th>Giá</th>
+                    <th>Địa Chỉ Cụ Thể</th>
+                    <th>Đường Liên Kết</th>
+                    <th>Người Đăng Bài</th>
+                    <th>Số Điện Thoại</th>
+                </tr>
+            </tfoot>
+   
+        </table>
+        <br>
+        
+      </div>
+  </div>
+</div>
+<br>
+
+
+
+      <script type="text/javascript" src="../static/assets/js/ll.js"></script>
+      <script type="text/javascript" src="../static/assets/js/ancu.js"></script>
+      <script type="text/javascript" src="../static/assets/js/muaban.js"></script>
+      <script type="text/javascript" src="../static/assets/js/dangbannhadat.js"></script>
+      <script type="text/javascript" src="../static/assets/js/nhadat24h.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+      
+
+      <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a  href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a> 
+                        - edited by <a target="_blank" href="https://www.linkedin.com/in/l%C3%A2m-l%C3%A3-5b2a361b8/">LL</a></p>
+                </div>
+
+                {% block right_footer %}{% endblock right_footer %}
+
+            </div>
+        </div>
+    </footer>
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+        
+        $(document).ready(function () {
+            
+            AncuChangeToServerSide();
+            MuaBanChangeToServerSide();
+            DangBanNhaDatChangeToServerSide();
+            NhaDat24hChangeToServerSide();
+            
+        });
+
+    </script>
+
+    <script src="/static/assets/js/jquery.json-viewer.js"></script>
+    
+{% endblock javascripts %}

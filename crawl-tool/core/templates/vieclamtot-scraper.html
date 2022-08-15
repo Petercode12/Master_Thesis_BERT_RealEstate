@@ -1,0 +1,824 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" href="../static/assets/css/ll.css">
+{% endblock stylesheets %}
+<meta charset="utf-8">
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Việc Làm Tốt Scraper</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Việc Làm Tốt Scrapers</h1>
+                  <p class="mb-0">Nhập từ khóa tìm kiếm và lấy toàn bộ tiêu đề cùng đường dẫn trang liên kết tùy theo số trang cần quét.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#vieclamtot" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Việc Làm Tốt Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-xl-4">
+                        <div class="mb-4">
+                            <label for="text">Từ Khóa</label>
+                            <input type="text" class="form-control" id="search_keyword" placeholder="Ví dụ: Data Scientist" aria-describedby="textHelp">
+                            <small id="textHelp" class="form-text text-muted">Nhập từ khóa hoặc danh sách từ khóa về nội dung liên quan cần quét.</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2">
+                        <div class="mb-4">
+                            <label for="text">Số Trang</label>
+                            <input type="text" class="form-control" id="end_page" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                            <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                        <button id="trigger-button" onclick="crawlViecLamTot($('#search_keyword').val(),$('#end_page').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+                    </div>
+                </div>
+            </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+        <div style="padding: 20px 0px 20px 20px">
+            <h2 class="h4">Crawling Statistics</h2>
+            <!-- <div class="times-chart"></div> -->
+            <canvas id="myChart"></canvas>
+            <br>
+            <button onclick="vieclamtot_update_chart()" class="button-17" id="update-chart">Update Chart</button>
+        </div>
+      </div>
+
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive">
+                <p>
+                <label for="text">Hiển Thị Mô Tả Công Việc</label>: 
+                    <button onclick="change(0)"  class="toggle-vis" data-column="6" value="Close">Tắt</button>  
+                    <label for="text">Hiển Thị Địa Chỉ</label>: 
+                    <button onclick="change(1)"  class="toggle-vis" data-column="25" value="Close">Tắt</button>  
+                </p>
+                <table id="data" class="display" style="width:auto;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <!-- <th></th> -->
+                            <th>Số Thứ Tự</th>
+                            <th>Thời Gian Đăng Bài</th>
+                            <th>Từ Khóa</th>
+                            <th>Tiêu Đề</th>
+                            <th>Công Việc</th>
+                            <th>Mô Tả Công Việc</th>
+                            <th>Tên Công Ty</th>
+                            <th>Số Lượng Tuyển Dụng</th>
+                            <th>Lương</th>
+                            <th>Lương Tối Thiểu</th>
+                            <th>Lương Tối Đa</th>
+                            <th>Hình Thức Trả Lương</th>
+                            <th>Kiểu Hợp Đồng</th>
+                            <th>Tuổi Tối Thiểu</th>
+                            <th>Tuổi Tối Đa</th>
+                            <th>Giới Tính</th>
+                            <th>Học Vấn</th>
+                            <th>Kinh Nghiệm Làm Việc</th>
+                            <th>Kĩ Năng</th>
+                            <th>Phúc Lợi</th>
+                            <th>Đường</th>
+                            <th>Phường</th>
+                            <th>Quận</th>
+                            <th>Thành Phố</th>
+                            <th>Địa Chỉ Cụ Thể</th>
+                            <th>Bản Đồ</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Người Đăng Bài</th>
+                            <th>Số Điện Thoại</th>
+                            <!-- <th>Thời Gian Tạo</th> -->
+                            
+                        </tr>
+                    </thead>
+		    
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>Thời Gian Đăng Bài</th>
+                            <th>Từ Khóa</th>
+                            <th>Tiêu Đề</th>
+                            <th>Công Việc</th>
+                            <th>Mô Tả Công Việc</th>
+                            <th>Tên Công Ty</th>
+                            <th>Số Lượng Tuyển Dụng</th>
+                            <th>Lương</th>
+                            <th>Lương Tối Thiểu</th>
+                            <th>Lương Tối Đa</th>
+                            <th>Hình Thức Trả Lương</th>
+                            <th>Kiểu Hợp Đồng</th>
+                            <th>Tuổi Tối Thiểu</th>
+                            <th>Tuổi Tối Đa</th>
+                            <th>Giới Tính</th>
+                            <th>Học Vấn</th>
+                            <th>Kinh Nghiệm Làm Việc</th>
+                            <th>Kĩ Năng</th>
+                            <th>Phúc Lợi</th>
+                            <th>Đường</th>
+                            <th>Phường</th>
+                            <th>Quận</th>
+                            <th>Thành Phố</th>
+                            <th>Địa Chỉ Cụ Thể</th>
+                            <th>Bản Đồ</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Người Đăng Bài</th>
+                            <th>Số Điện Thoại</th>
+                        </tr>
+                    </tfoot>
+		   
+                </table>
+                <br>
+                <!-- <p><h3>Các số điện thoại của từng ngành nghề</h3></p>
+                <table id="phonedata" class="display">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Nghành nghề</th>
+                            <th>Danh sách số điện thoại</th>
+                            <th>Số SDT</th>
+                        </tr>
+                    </thead>
+
+                    <tfoot>
+                        <tr>
+                            <th>Nghành nghề</th>
+                            <th>Danh sách số điện thoại</th>
+                        </tr>
+                    </tfoot> 
+                </table> -->
+              </div>
+          </div>
+      </div>
+      <br>
+      <div class="card border-light shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+              <p><h3>Các số điện thoại của từng ngành nghề</h3></p>
+              <table id="phonedata" class="display">
+                  <thead>
+                      <tr>
+                          <th></th>
+                          <th>Ngành nghề</th>
+                          <th>Danh sách số điện thoại</th>
+                      </tr>
+                  </thead>
+
+                  <!-- <tfoot>
+                      <tr>
+                          <th>Nghành nghề</th>
+                          <th>Danh sách số điện thoại</th>
+                      </tr>
+                  </tfoot> -->
+              </table>
+            </div>
+        </div>
+    </div>
+      <script type="text/javascript" src="../static/assets/js/ll.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+      
+
+      <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a  href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a> 
+                        - edited by <a target="_blank" href="https://www.linkedin.com/in/l%C3%A2m-l%C3%A3-5b2a361b8/">LL</a>
+                    and <a target="_blank" href="https://www.linkedin.com/in/quang-duc-nguyen-a72967230/">Gym Boiz NQD</a></p>
+                </div>
+
+                {% block right_footer %}{% endblock right_footer %}
+
+                <!--
+                <div class="col-12 col-lg-6">
+                    
+                </div>
+                -->
+            </div>
+        </div>
+    </footer>
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+        
+        currentTimestamp = parseInt(moment().unix());
+        theInterval = null;
+
+        function deleteDatatableRecords(){
+
+            id_array = [];
+            const re_id = /(>[0-9:-\s]+<)/;
+            $( ".odd" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[1].innerHTML); 
+                } 
+            });
+
+            $( ".even" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[1].innerHTML); 
+                } 
+            });
+            
+            for (let i = 0;i < id_array.length; i++){
+                var re_new_id = new Date(id_array[i].match(re_id)[1].slice(1, -1));
+                id_array[i] = re_new_id.getTime()/1000 + 25200 * 2;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/vieclamtot-delete-data/',
+                data: {
+                    "id_array": id_array.join(','),
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã xóa thành công !!!'
+                    });
+                    
+                    $('#data').DataTable().clear().draw();
+                    $('#phonedata').DataTable().clear().draw();
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Xóa thất bại hoặc bạn chưa chọn dữ liệu để xóa !!!'
+                    });
+                    
+                },
+            });
+        }
+
+        function refreshDatatable(){
+            $('.table-responsive').toggle();
+        }
+
+        function changeToClientSide(){
+            $('#data').DataTable().destroy();
+            $('#data').DataTable({
+                serverSide: false,
+                searching: false,
+                paging: false,
+                destroy: true,
+                bSort: false,
+                dom: 'Bfrtip',
+                buttons:[
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    {
+                        text: "Tắt Tự Động Cập Nhật",
+                        className: 'btn-danger',
+                        action: function (e, dt, node, config) {
+                            clearInterval(theInterval);
+                            $('#data').DataTable().destroy();
+                            changeToServerSide();
+                        },
+                    },
+                ]
+            });
+            $('#data').DataTable().clear().draw();
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-primary');
+            }, 100);
+
+            theInterval = setInterval(function(){ 
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/vieclamtot-auto-data/',
+                    data: {
+                        "timestamp": parseInt(currentTimestamp)
+                    },
+                    success: function (response) {
+
+                        $('#data').DataTable().clear().draw();
+
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'success',
+                                    background: '#1b998b',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+                        
+                        // notyf.open({
+                        //     type: 'success',
+                        //     message: 'Có dữ liệu mới !!!'
+                        // });
+
+                        for (i = 0; i < response.data.length; i++) {
+                            $('#data').dataTable().fnAddData([
+                                // '',
+                                // response.data[i]["id"],
+                                response.data[i]["updated_at"],
+                                response.data[i]["search_keyword"],
+                                response.data[i]["post_title"],
+                                response.data[i]["job_type"],
+                                response.data[i]["full_description"],
+                                response.data[i]["company_name"],
+                                response.data[i]["vacancies"],
+                                response.data[i]["salary_with_unit"],
+                                response.data[i]["min_salary"],
+                                response.data[i]["max_salary"],
+                                response.data[i]["salary_type"],
+                                response.data[i]["contract_type"],
+                                response.data[i]["min_age"],
+                                response.data[i]["max_age"],
+                                response.data[i]["preferred_gender"],
+                                response.data[i]["preferred_education"],
+                                response.data[i]["preferred_working_experience"],
+                                response.data[i]["skills"],
+                                response.data[i]["benefits"],
+                                response.data[i]["street_number"],
+                                response.data[i]["ward"],
+                                response.data[i]["district"],
+                                response.data[i]["city"],
+                                response.data[i]["address"],
+                                response.data[i]["coordinate"],
+                                response.data[i]["url"],
+                                response.data[i]["post_author"],
+                                response.data[i]["post_time"],
+                                response.data[i]["phone"]
+                            ]);
+                        }
+
+                        $('#data').DataTable().order([1, 'asc']).draw();
+                        $('#data').DataTable().order([0, 'asc']).draw();
+                        
+                        // $('#data').DataTable().clear().draw();
+                    },
+                    error: (xhr) => {
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'error',
+                                    background: '#FA5151',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+
+                        notyf.open({
+                            type: 'error',
+                            message: 'Kết nối thất bại !!!'
+                        });
+                        
+                    },
+                });
+
+            }, 5000);
+
+        };
+        
+        function PhoneUserTableDisplay(){
+            var table = $('#phonedata').DataTable({
+                lengthChange: false,
+                pageLength: 10,
+                responsive: true,
+                serverSide: true,
+                order: [[ 1, "asc" ]],
+                sAjaxSource: '/vieclamtot-phone-data/',
+                columns:
+                    [
+                        {
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
+                        },
+                        {name: 'job_type', data: 1},
+                        {name: 'string_phone', data: 2,
+                        render: function(data, type){
+                            if( type === 'display'){
+                                let strPhone = data.length > 58 ? data.slice(0, 58) + "..." : data 
+                                return '<div>' + strPhone + '</div>'
+                            }
+                            return data;
+                        }
+                    }
+                    ]
+            });
+            $('#phonedata tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+                //var row = $('#docsTbl').DataTable().row(tr);
+            
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    row.child(format(row.data())).show();
+                    tr.addClass('shown');
+                }
+            });
+        };
+        function changeToServerSide(){
+            var table = $('#data').DataTable({
+                lengthMenu: [[10, 20, 25, 50, 100], [10, 20, 25, 50, 100]],
+                language: {
+                "lengthMenu": "Hiện _MENU_ hàng mỗi trang (cũng là số dòng khi tải file về)"
+                },
+                responsive: true,
+                serverSide: true,
+                destroy: true,
+                scrollX: true,
+                order: [[ 2, "desc" ]],
+                sAjaxSource: "/vieclamtot-show-data/",  
+                    columnDefs: [
+                        {
+                            targets: 6,
+                            visible: false
+                        },
+                        {
+                            targets: 25,
+                            visible: false
+                        },
+                        {
+                            targets: 1,
+                            visible: false
+                            
+                        },
+                        {"className": "dt-center", "targets": "_all"}
+                    ],
+                    columns: [
+                            {
+                        'data':null,
+                        'defaultContent':'',
+                        'checkboxes':{
+        
+        
+                            'selectRow':true
+                        }},
+                        {name: "id", data: 0},
+                        {name: "format_time", data: 2, render: display_date},
+                        {name: "search_keyword", data: 3},
+                        {name: "post_title", data: 4},
+                        {name: "job_type", data: 5},
+                        {name: "full_description", data: 6},
+                        {name: "company_name", data: 7},
+                        {name: "vacancies", data: 8},
+                        {name: "salary_with_unit", data: 9},
+                        {name: "min_salary", data: 10},
+                        {name: "max_salary", data: 11},
+                        {name: "salary_type", data: 12},
+                        {name: "contract_type", data: 13},
+                        {name: "min_age", data: 14},
+                        {name: "max_age", data: 15},
+                        {name: "preferred_gender", data: 16},
+                        {name: "preferred_education", data: 17},
+                        {name: "preferred_working_experience", data: 18},
+                        {name: "skills", data: 19},
+                        {name: "benefits", data: 20},
+                        {name: "street_number", data: 21},
+                        {name: "ward", data: 22},
+                        {name: "district", data: 23},
+                        {name: "city", data: 24},
+                        {name: "address", data: 25},
+                        {name: "coordinate", data: 26,
+                    render: function(data, type){
+                        if (data != null && data !=', ') {
+                            return '<a class="table_link" target="_blank" href="https://www.google.com/maps/place/' + data + '">Ấn Để Xem Vị Trí</p>';
+                        }
+                        else {
+                            return '<p>Không</p>';
+                        }
+                        return data;
+                    }
+                },
+                        {name: "url", data: 27, 
+                            render: function(data, type) {
+                                if (type === 'display') {
+                                    return '<a class="table_link" target="_blank" href="' + data + '">' + data + '</a>';
+
+                                }
+                                return data;
+                            }},
+                        {name: "post_author", data: 28},
+                        {name: "phone", data: 29}
+                        
+                    ],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                vieclamtot_update_chart()
+                            },
+                        },
+                        'copyHtml5',
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            filename: function(){
+                                return 'Thông Tin Việc Làm Tốt'
+                            }
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            filename: function(){
+                                return 'Thông Tin Việc Làm Tốt'
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            filename: function(){
+                                return 'Thông Tin Việc Làm Tốt'
+                            }
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: 'delete-btn',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ],
+                    initComplete: function () {
+                    this.api().columns([5]).every( function () {
+                        var column = this ;
+                        var select = $('<br><br><select><option value="">Tất Cả</option></select>')
+                            .appendTo( $(column.footer()) )
+                            .on( 'change', function () {
+                                // val.replace(/\\\//g, "/")
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                // column
+                                //     .search( val ? '^'+val+'$' : '', true, false )
+                                //     .draw();
+                                table.search(val.replace(/\\\//g, "/"));
+                                table.order([3, 'asc']).draw();
+                            } );
+                            $( select ).click( function(e) {
+                                        e.stopPropagation();
+                                });
+                            $.ajax(
+                                {
+                                type: 'POST',
+                                url: '/vieclamtot-get-job-filter/',
+                                success: function(response){
+                                    let jobs = response.job_type;
+                                    for (let i = 0; i < jobs.length; i++){
+                                        select.append( '<option value="' + jobs[i]['job_type'] + '">' + jobs[i]['job_type'] + '</option>' )
+                                    }
+                                }
+                            });
+                    } );
+                }
+            });
+            $('button.toggle-vis').on( 'click', function (e) {
+                    e.preventDefault();
+            
+                    // Get the column API object
+                    var column = table.column( $(this).attr('data-column') );
+            
+                    // Toggle the visibility
+                    column.visible( ! column.visible() );
+                } );
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+
+        }
+
+        $(document).ready(function () {
+            PhoneUserTableDisplay()
+            changeToServerSide()
+            getChartData()
+            $('#data').on( 'page.dt', function () {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 300);
+            
+            } );
+            // $('#data').DataTable( {
+                
+            // } );
+        });
+
+    function crawlViecLamTot(search_keyword,end_page){
+
+        if (search_keyword == '' || end_page == ''){
+
+            const notyf = new Notyf({
+                    position: {
+                        x: 'right',
+                        y: 'top',
+                    },
+                    ripple: true,
+                    types: [
+                        {
+                            type: 'error',
+                            background: '#FA5151',
+                            icon: {
+                                className: '',
+                                tagName: 'span',
+                                color: '#fff'
+                            },
+                            dismissible: true,
+                        }
+                    ]
+                });
+                notyf.open({
+                    type: 'error',
+                    message: 'Vui lòng nhập đầy đủ thông số tìm kiếm !!!'
+                });
+                $("#trigger-button").attr("disabled", false);
+                $("#trigger-button").html('Quét Dữ Liệu');
+
+        }
+
+        else{
+
+            $("#trigger-button").attr("disabled", true);
+
+            $("#trigger-button").html('<i class="fas fa-sync fa-spin"></i>');
+
+            $.ajax({
+                type: 'POST',
+                url: '/vieclamtot-get-data/',
+                data: {
+                    "search_keyword": search_keyword,
+                    "end_page": end_page
+                },
+                success: function (response) {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã gửi lệnh quét thành công!'
+                    });
+                    $('#data').DataTable().clear().draw();
+
+                    setTimeout(function(){
+                        $("#trigger-button").attr("disabled", false);
+                        $("#trigger-button").html('Quét Dữ Liệu');
+                    }, 5000);
+
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'error',
+                        message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                    });
+                    $("#trigger-button").attr("disabled", false);
+                    $("#trigger-button").html('Quét Dữ Liệu');
+                },
+            });
+
+        }
+
+    }
+
+    </script>
+
+    <script src="/static/assets/js/jquery.json-viewer.js"></script>
+    
+{% endblock javascripts %}

@@ -1,0 +1,180 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" href="../static/assets/css/ll.css">
+{% endblock stylesheets %}
+<meta charset="utf-8">
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+      <input type="text" name="dunno" id="input_text" value="{{job_type}}" style="visibility: hidden;">
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item"><a href="/vieclamtot-scraper">Việc Làm Tốt Scraper</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Phone User</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 id="job_title" class="h4" value="{{job_type}}">Danh sách số điện thoại từ Việc Làm Tốt</h1>
+                  <p class="mb-0">Danh sách số điện thoại của các người dùng quan tâm đến ngành nghề: {{job_type}}.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#vieclamtot" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Việc Làm Tốt Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      
+
+      <br>
+      <div class="card border-light shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+              <p><h3>Danh sách số điện thoại</h3></p>
+              <table id="phone" class="display">
+                  <thead>
+                      <tr>
+                          <th>Thời Gian Đăng Bài Gần Nhất</th>
+                          <th>Người Đăng</th>
+                          <th>Số Điện Thoại</th>
+                          <th>Địa Chỉ</th>
+                      </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                        <th>Thời Gian Đăng Bài Gần Nhất</th>
+                        <th>Người Đăng</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Địa Chỉ</th>
+                    </tr>
+                  </tfoot>
+              </table>
+            </div>
+        </div>
+    </div>
+      <script type="text/javascript" src="../static/assets/js/ll.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+      
+
+      <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a  href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a> 
+                        - edited by <a target="_blank" href="https://www.linkedin.com/in/l%C3%A2m-l%C3%A3-5b2a361b8/">LL</a>
+                    and <a target="_blank" href="https://www.linkedin.com/in/quang-duc-nguyen-a72967230/">Gym Boiz NQD</a></p>
+                </div>
+
+                {% block right_footer %}{% endblock right_footer %}
+
+                <!--
+                <div class="col-12 col-lg-6">
+                    
+                </div>
+                -->
+            </div>
+        </div>
+    </footer>
+  </main>
+{% endblock content %}
+{% block javascripts %}
+
+{% csrf_token %}
+<script type="text/javascript">
+
+    function displayContent(){
+        var job_type = document.querySelector('#job_title').getAttribute('value');
+        var phone = $('#phone').DataTable({
+            lengthMenu: [[10, 20, 25, 50, 100, 200, 500], [10, 20, 25, 50, 100, 200, 500]],
+            language: {
+                "lengthMenu": "Hiện _MENU_ hàng mỗi trang (cũng là số dòng khi tải file về)"
+            },
+            pageLength: 10,
+            responsive: true,
+            serverSide: true,
+            searching: true,
+            order: [[ 0, "asc" ]],
+            sAjaxSource: '/vieclamtot-phone-user-data/',
+            fnServerParams: function ( aoData ) {
+                aoData.push( {"name": "job_type", "value": job_type.toString()} );
+                },
+            columnDefs:[
+                {"className": "dt-center", "targets": "_all"}
+            ],
+            columns:[
+                {name: "post_time", data: 0, render: display_date},
+                {name: "post_author", data: 1},
+                {name: "phone", data: 2},
+                {name: "address", data: 3},
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'copyHtml5',
+                {
+                    extend: 'excelHtml5',
+                    text: 'Excel',
+                    filename: function(){
+                        return 'SDT User Quan Tâm Ngành ' + job_type.toString()
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: 'CSV',
+                    filename: function(){
+                        return 'SDT User Quan Tâm Ngành ' + job_type.toString()
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'CSV',
+                    filename: function(){
+                        return 'SDT User Quan Tâm Ngành ' + job_type.toString()
+                    }
+                },
+                ],
+            bFilter:true,
+            // initComplete: function() {
+            //     var api = this.api();
+
+            //     // Apply the search
+            //     api.columns([0,1,2,3]).every(function() {
+            //         var that = this;
+
+            //         $('input', this.footer()).on('keyup change clear', function() {
+            //         if (that.search() !== this.value) {
+            //             that
+            //             .search(this.value).draw();
+            //         }
+            //         });
+            //     });
+            // }
+            
+        });
+        setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+    };
+    
+    $(document).ready(function () {
+        // $('#phone tfoot th').each(function() {
+        //     var title = $(this).text();
+        //     $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+        // });
+        displayContent();
+        });
+</script>
+{% endblock javascripts %}

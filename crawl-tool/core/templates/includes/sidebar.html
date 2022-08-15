@@ -1,0 +1,93 @@
+<nav id="sidebarMenu" class="sidebar d-md-block bg-primary text-white collapse px-4">
+    <div class="sidebar-sticky pt-3 mx-auto">
+        <div
+            class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
+            <div class="d-flex align-items-center">
+                <div class="user-avatar lg-avatar mr-4">
+                    <img src="/static/assets/img/team/Thien.jpg" class="card-img-top rounded-circle border-white"
+                        alt="Bonnie Green">
+                </div>
+                <div class="d-block">
+                    <h2 class="h6">
+                        {{ request.user.lastname }} {{ request.user.firstname }}
+                    </h2>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary text-dark btn-xs">
+                        <span class="mr-2"><span class="fas fa-sign-out-alt"></span></span>Sign Out</a>
+                </div>
+            </div>
+            <div class="collapse-close d-md-none">
+                <a href="#sidebarMenu" class="fas fa-times" data-toggle="collapse" data-target="#sidebarMenu"
+                    aria-controls="sidebarMenu" aria-expanded="true" aria-label="Toggle navigation"></a>
+            </div>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item  {% if 'google-scraper' in segment %} active {% endif %}">
+                <a href="/google-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-chart-pie"></span></span>
+                    <span>Google Scraper</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'facebook-search' in segment %} active {% endif %}">
+                <a href="/facebook-search-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-hand-holding-usd"></span></span>
+                    <span>Facebook Search</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'facebook-post' in segment %} active {% endif %}">
+                <a href="/facebook-post-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-box-open"></span></span>
+                    <span>Facebook Post</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'facebook-user-profile' in segment %} active {% endif %}">
+                <a href="/facebook-user-profile-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-user"></span></span>
+                    <span>Facebook User Profile</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'vieclamtot-scraper' in segment %} active {% endif %}">
+                <a href="/vieclamtot-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-briefcase"></span></span>
+                    <span>Việc Làm</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'vieclamfb-employment-counseling' in segment %} active {% endif %}">
+                <a href="/vieclamfb-employment-counseling" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-briefcase"></span></span>
+                    <span>Tư Vấn Nghề Nghiệp</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'vieclamfb-scraper' in segment %} active {% endif %}">
+                <a href="/vieclamfb-scraper" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-briefcase"></span></span>
+                    <span>Việc Làm Groups FB</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'facebook-post' in segment %} active {% endif %}">
+                <a href="/estate-scraper" class="nav-link">
+                <span class="sidebar-icon"><span class="fas fa-box-open"></span></span>
+                <span>Real Estate</span>
+                </a>
+            </li>
+            <li class="nav-item  {% if 'binh-duong-real-estate' in segment %} active {% endif %}">
+                <a href="/binh-duong-real-estate" class="nav-link">
+                <span class="sidebar-icon"><span class="fas fa-book"></span></span>
+                <span>Bình Dương Real Estate</span>
+                </a>
+            </li>
+            <li role="separator" class="dropdown-divider mt-4 mb-3 border-black"></li>
+            <li class="nav-item  {% if 'facebook-cookie-check' in segment %} active {% endif %}">
+                <a href="/facebook-cookie-check" class="nav-link">
+                    <span class="sidebar-icon"><span class="fas fa-cog"></span></span>
+                    <span>Kiểm Tra Cookie</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a target="_blank" href="/doc-start" class="nav-link d-flex align-items-center">
+                    <span class="sidebar-icon"><span class="fas fa-book"></span></span>
+                    <span>Tài Liệu <span class="badge badge-md bg-secondary ms-1 text-dark">v0.1</span></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

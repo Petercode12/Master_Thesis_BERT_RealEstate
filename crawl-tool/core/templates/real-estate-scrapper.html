@@ -1,0 +1,575 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Real Estate Scraper</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Real Estate Scraper</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="mb-3 mb-lg-0" style="margin: 20px 20px 0px 20px">
+            <h1 class="h4">Most popular areas</h1>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+        <canvas id="chart"></canvas>
+        <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+            <button id="trigger-button-parsing" onclick="start_parsing()" class="btn btn-lg btn-secondary"
+                style="margin: 0.75rem 0.75rem 0.75rem 0.75rem;" type="button">Parse</button>
+        </div>
+    </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-xl-4">
+                    <div class="mb-4">
+                        <img style="margin-top:1.5rem; background-color: #ffba00"
+                            src="https://static.chotot.com/storage/marketplace/transparent_logo.png"
+                            alt="Real Estate Scraper" class="img-fluid">
+                        <a src="https://nha.chotot.com/mua-ban-bat-dong-san?page="></a>
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">Start page</label>
+                        <input type="number" class="form-control" id="chotot_start" placeholder="Example: 0"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">End page</label>
+                        <input type="number" class="form-control" id="chotot_end" placeholder="Example: 3000"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                    <button id="trigger-button-chotot"
+                        onclick="crawRealEstate($('#chotot_start').val(),$('#chotot_end').val(), 'chotot')"
+                        class="btn btn-lg btn-secondary" style="margin-top: 0.75rem;" type="button">Start
+                        scanning</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <table id="chotot" class="hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Posted at</th>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Size</th>
+                        <th>Property legal</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-xl-4">
+                    <div class="mb-4">
+                        <img style="margin-top:1.5rem" src="https://staticfile.batdongsan.com.vn/images/logo/h-logo.svg"
+                            alt="Real Estate Scraper" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">Start page</label>
+                        <input type="number" class="form-control" id="batdongsancom_start" placeholder="Example: 0"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">End page</label>
+                        <input type="number" class="form-control" id="batdongsancom_end" placeholder="Example: 3000"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                    <button id="trigger-button-batdongsandotcom"
+                        onclick="crawRealEstate($('#batdongsancom_start').val(),$('#batdongsancom_end').val(), 'batdongsandotcom')"
+                        class="btn btn-lg btn-secondary" style="margin-top: 0.75rem;" type="button">Start
+                        scanning</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <table id="batdongsancom" class="hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Posted at</th>
+                        <th>Post ranking</th>
+                        <th>Price</th>
+                        <th>Size</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-xl-4">
+                    <div class="mb-4">
+                        <img style="margin-top:1.5rem" src="https://muaban.net/Content/images/logo.gif"
+                            alt="Real Estate Scraper" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">Start page</label>
+                        <input type="number" class="form-control" id="muabannet_start" placeholder="Example: 0"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2">
+                    <div class="mb-4">
+                        <label for="number">End page</label>
+                        <input type="number" class="form-control" id="muabannet_end" placeholder="Example: 3000"
+                            aria-describedby="textHelp">
+                    </div>
+                </div>
+                <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                    <button id="trigger-button-muabannet"
+                        onclick="crawRealEstate($('#muabannet_start').val(),$('#muabannet_end').val(), 'muabannet')"
+                        class="btn btn-lg btn-secondary" style="margin-top: 0.75rem;" type="button">Start
+                        scanning</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <table id="muabannet" class="hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Posted at</th>
+                        <th>Title</th>
+                        <th>Location</th>
+                        <th>Price</th>
+                        <th>Size</th>
+                        <th>Property legal</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    {% include 'includes/footer.html' %}
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% csrf_token %}
+<script type="text/javascript">
+
+    function crawRealEstate(startPage, endPage, option) {
+
+        if (startPage == '' || endPage == '' || option == '') {
+
+            const notyf = new Notyf({
+                position: {
+                    x: 'right',
+                    y: 'top',
+                },
+                ripple: true,
+                types: [
+                    {
+                        type: 'error',
+                        background: '#FA5151',
+                        icon: {
+                            className: '',
+                            tagName: 'span',
+                            color: '#fff'
+                        },
+                        dismissible: true,
+                    }
+                ]
+            });
+            notyf.open({
+                type: 'error',
+                message: 'Vui lòng nhập đầy đủ thông số tìm kiếm !!!'
+            });
+            $("#trigger-button-" + option).attr("disabled", false);
+            $("#trigger-button-" + option).html('Start scanning');
+
+        }
+
+        else {
+
+            $("#trigger-button-" + option).attr("disabled", true);
+
+            $("#trigger-button-" + option).html('<i class="fas fa-sync fa-spin"></i>');
+
+            $.ajax({
+                type: 'POST',
+                url: '/estate-scraper/get-data/',
+                data: {
+                    "start_page": startPage,
+                    "end_page": endPage,
+                    "option": option,
+                },
+                success: function (response) {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'success',
+                        message: 'Start scanning ...'
+                    });
+
+                    setTimeout(function () {
+                        $("#trigger-button-" + option).attr("disabled", false);
+                        $("#trigger-button-" + option).html('Start scanning');
+                    }, 5000);
+                    $("#trigger-button-" + option).attr("disabled", false);
+                    $("#trigger-button-" + option).html('Start scanning');
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'error',
+                        message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                    });
+                    $("#trigger-button-" + option).attr("disabled", false);
+                    $("#trigger-button-" + option).html('Start scanning');
+                },
+            });
+
+        }
+    }
+
+    function start_parsing() {
+        $("#trigger-button-parsing").attr("disabled", true);
+        $("#trigger-button-parsing").html('<i class="fas fa-sync fa-spin"></i>');
+        $.ajax({
+            type: 'POST',
+            url: '/estate-scraper/parsing/',
+            success: function (response) {
+                const notyf = new Notyf({
+                    position: {
+                        x: 'right',
+                        y: 'top',
+                    },
+                    ripple: true,
+                    types: [
+                        {
+                            type: 'success',
+                            background: '#1b998b',
+                            icon: {
+                                className: '',
+                                tagName: 'span',
+                                color: '#fff'
+                            },
+                            dismissible: true,
+                        }
+                    ]
+                });
+                notyf.open({
+                    type: 'success',
+                    message: 'Successfully parsed'
+                });
+
+                setTimeout(function () {
+                    $("#trigger-button-parsing").attr("disabled", false);
+                    $("#trigger-button-parsing").html('Start parsing');
+                }, 5000);
+                draw_chart()
+                $("#trigger-button-parsing").attr("disabled", false);
+                $("#trigger-button-parsing").html('Start parsing');
+            },
+            error: (xhr) => {
+                const notyf = new Notyf({
+                    position: {
+                        x: 'right',
+                        y: 'top',
+                    },
+                    ripple: true,
+                    types: [
+                        {
+                            type: 'error',
+                            background: '#FA5151',
+                            icon: {
+                                className: '',
+                                tagName: 'span',
+                                color: '#fff'
+                            },
+                            dismissible: true,
+                        }
+                    ]
+                });
+                notyf.open({
+                    type: 'error',
+                    message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                });
+                $("#trigger-button-parsing").attr("disabled", false);
+                $("#trigger-button-parsing").html('Start scanning');
+            },
+        });
+    }
+
+    $(document).ready(function () {
+        draw_chart()
+        showChototData()
+        showBatdongsanData()
+        showMuabannetData()
+    })
+
+    function showChototData() {
+        $('#chotot').DataTable({
+            // data: dataSet,
+            "ajax": {
+                url: '/estate-scraper/show-data/chotot',
+                dataSrc: '',
+            },
+            "columns": [
+                { data: 0 },
+                { data: 1 },
+                { data: 2 },
+                { data: 3 },
+                { data: 4 },
+                { data: 5 },
+                { data: 6 },
+                { data: 7 }
+            ],
+            columnDefs: [{
+                render: $.fn.dataTable.render.moment = function (from, to, locale) {
+                    return moment(from).format('DD/MM/YYYY');
+                },
+                targets: 1
+            }]
+        })
+    }
+
+    function showMuabannetData() {
+        $('#muabannet').DataTable({
+            // data: dataSet,
+            "ajax": {
+                url: '/estate-scraper/show-data/muabannet',
+                dataSrc: '',
+            },
+            "columns": [
+                { data: 0 },
+                { data: 1 },
+                { data: 2 },
+                { data: 3 },
+                { data: 4 },
+                { data: 5 },
+                { data: 6 },
+                { data: 7 },
+                { data: 8 },
+            ],
+            columnDefs: [{
+                render: $.fn.dataTable.render.moment = function (from, to, locale) {
+                    return moment(from).format('DD/MM/YYYY');
+                },
+                targets: 1
+            }]
+        })
+    }
+
+    function showBatdongsanData() {
+        $('#batdongsancom').DataTable({
+            // data: dataSet,
+            "ajax": {
+                url: '/estate-scraper/show-data/batdongsancom',
+                dataSrc: '',
+            },
+            "columns": [
+                { data: 0 },
+                { data: 1 },
+                { data: 2 },
+                { data: 3 },
+                { data: 4 },
+                { data: 5 },
+                { data: 6 },
+                { data: 7 }
+            ],
+            columnDefs: [{
+                render: $.fn.dataTable.render.moment = function (from, to, locale) {
+                    return moment(from).format('DD/MM/YYYY');
+                },
+                targets: 1
+            }]
+        })
+    }
+
+    var data = [{
+        data: [50, 55, 60, 33],
+        backgroundColor: [
+            "#4b77a9",
+            "#5f255f",
+            "#d21243",
+            "#B27200"
+        ],
+        borderColor: "#fff"
+    }];
+
+    var options = {
+        tooltips: {
+            enabled: true
+        },
+        plugins: {
+            datalabels: {
+                formatter: (value, ctx) => {
+
+                    let sum = ctx.dataset._meta[0].total;
+                    let percentage = (value * 100 / sum).toFixed(2) + "%";
+                    return percentage;
+
+
+                },
+                color: '#fff',
+            }
+        }
+    };
+
+    var myChart
+    function draw_chart() {
+        var ctx = document.getElementById("chart").getContext("2d");
+        if (myChart)
+            myChart.destroy();
+
+        $.get('estate-scraper/chart-data', data => {
+            myChart = new Chart(ctx, {
+                data: data,
+                responsive: true,
+                maintainAspectRatio: false,
+                type: 'bar',
+                options: {
+                    borderRadius: 10,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                    },
+                    layout: {
+                        padding: {
+                            top: 25,
+                            right: 100,
+                            bottom: 25,
+                            left: 25
+                        }
+                    },
+                    indexAxis: 'y',
+                }
+            });
+        })
+    }
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.21/dataRender/datetime.js"></script>
+
+<style>
+    td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 500px;
+    }
+
+    tr {
+        max-width: fit-content;
+    }
+
+    .dataTables_wrapper {
+        width: 100%;
+        overflow: auto;
+    }
+
+    .chartjs-size-monitor {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+        overflow: hidden;
+        pointer-events: none;
+        visibility: hidden;
+        z-index: -1;
+    }
+</style>
+{% endblock javascripts %}

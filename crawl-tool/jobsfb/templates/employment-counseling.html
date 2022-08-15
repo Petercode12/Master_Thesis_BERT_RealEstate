@@ -1,0 +1,184 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+<style>
+    td.details-control {
+        background: url('/static/assets/img/team/details_open.png') no-repeat center center;
+        cursor: pointer;
+    }
+
+    tr.details td.details-control {
+        background: url('/static/assets/img/team/details_close.png') no-repeat center center;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tư vấn nghề nghiệp</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Tư vấn nghề nghiệp</h1>
+            </div>
+        </div>
+    </div>
+
+    <form>
+        <div class="form-group">
+            <label for="exampleFormControlSelect1">Hình thức</label>
+            <select class="form-control" id="exampleFormControlSelect1">
+                <option value="1">Việc tìm người</option>
+                <option value="2">Người tìm việc</option>
+            </select>
+        </div>
+        <div>&nbsp;</div>
+        <div>
+            <label for="exampleFormControlSelect1">Giới tính</label>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline1"> Nam</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline2"> Nữ</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline2">Khác</label>
+            </div>
+        </div>
+        <div>&nbsp;</div>
+        <div class="row">
+            <div class="col">
+                <label for="exampleFormControlSelect1">Thông tin cá nhân</label>
+                <input type="text" class="form-control" placeholder="Họ và tên" required>
+                <div class="invalid-feedback">
+                    Cần nhập vào thông tin cá nhân
+                  </div>
+            </div>
+        </div>
+        <div>&nbsp;</div>
+        <div class="form-group"> <!-- Date input -->
+            <label class="control-label" for="date">Ngày tháng năm sinh</label>
+            <input class="form-control" id="date" name="date" placeholder="MM/DD/YYY" type="date" required/>
+          </div>
+        <div>&nbsp;</div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Mô tả công việc</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Nhập vào mô tả công việc" required>
+        </div>
+        <div>&nbsp;</div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Địa điểm</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Nhập vào địa điểm làm việc" required>
+        </div>
+        <div>&nbsp;</div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Thông tin liên lạc</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Nhập vào thông tin liên lạc" required>
+        </div>
+        <div>&nbsp;</div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Mức lương mong muốn (VND)</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Nhập vào range lương" required>
+        </div>
+        <div>&nbsp;</div>
+        <div class="form-group">
+            <label for="exampleFormControlSelect1">Thời gian</label>
+            <select class="form-control" id="exampleFormControlSelect1">
+                <option value="1">Fulltime</option>
+                <option value="2">Part time</option>
+                <option value="2">Làm theo ca</option>
+            </select>
+        </div>
+        <div>&nbsp;</div>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Gửi</button>
+        </div>
+    </form>
+
+    <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a>
+                        - edited by <a target="_blank"
+                            href="https://www.linkedin.com/in/thiện-huỳnh-ngọc-8481b6194">Huỳnh Ngọc Thiện</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% csrf_token %}
+<script type="text/javascript">
+
+    currentTimestamp = parseInt(moment().unix());
+    theInterval = null;
+
+    (function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+
+</script>
+
+<script>
+    $(document).ready(function(){
+      var date_input=$('input[name="date"]'); //our date input has the name "date"
+      var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+      var options={
+        format: 'mm/dd/yyyy',
+        container: container,
+        todayHighlight: true,
+        autoclose: true,
+      };
+      date_input.datepicker(options);
+    })
+</script>
+
+<script src="/static/assets/js/jquery.json-viewer.js"></script>
+
+{% endblock javascripts %}

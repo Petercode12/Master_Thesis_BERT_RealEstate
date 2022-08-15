@@ -1,0 +1,526 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+    <style>
+        td.details-control {
+            background: url('/static/assets/img/team/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.details td.details-control {
+            background: url('/static/assets/img/team/details_close.png') no-repeat center center;
+        }
+    </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Việc Làm Group Facebook</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Việc Làm Group Facebook</h1>
+              </div>
+              <div>
+                  <a href="/doc-start/#fbp" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Facebook Post Scraper</a>
+              </div>
+          </div>
+      </div>
+
+    <div class="card border-light shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row" id="check-facebook">
+                <div>
+                    <button id="trigger-button" onclick="crawlFacebookPost()" class="btn btn-lg btn-secondary" type="button">Quét Dữ Liệu</button>
+                    <button id="trigger-button" onclick="location.href='/vieclamfb-user-profile-scraper';" class="btn btn-lg btn-primary" type="button">User Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive" id="table-wrapper">
+                <table id="data" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>ID Nhóm Facebook</th>
+                            <th>ID Bài Đăng</th>
+                            <th>ID Người Đăng</th>
+                            <th>Nội Dung</th>
+                            <th>Ảnh Liên Kết</th>
+                            <th>Chú Thích</th>
+                            <th>Số Lươt Thích</th>
+                            <th>Số Bình Luận</th>
+                            <th>Số Lươt Chia Sẻ</th>
+                            <th>Thời Gian Đăng</th>
+                            <th>Ngày Khởi Tạo</th>
+                            <th>Ngày Cập Nhật</th>
+                        </tr>
+                    </thead>
+                </table>
+              </div>
+          </div>
+      </div>
+
+      <footer class="footer section py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <p class="mb-0 text-center text-xl-left">
+                        &copy; <a  href="https://github.com/WhiteWolf21" target="_blank">Django Tools</a> 
+                        - edited by <a target="_blank" href="https://www.linkedin.com/in/thiện-huỳnh-ngọc-8481b6194">Huỳnh Ngọc Thiện</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+        
+        currentTimestamp = parseInt(moment().unix());
+        theInterval = null;
+
+        function deleteDatatableRecords(){
+
+            id_array = [];
+
+            $( ".odd" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $( ".even" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-post-job-delete-data/',
+                data: {
+                    "id_array": id_array.join(','),
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã xóa thành công !!!'
+                    });
+                    
+                    $('#data').DataTable().clear().draw();
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Xóa thất bại hoặc bạn chưa chọn dữ liệu để xóa !!!'
+                    });
+                    
+                },
+            });
+        }
+
+        function refreshDatatable(){
+            $('.table-responsive').toggle();
+        }
+
+        function changeToClientSide(){
+            $('#data').DataTable().destroy();
+            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>');
+            $('#data').DataTable({
+                bInfo : false,
+                serverSide: false,
+                searching: false,
+                paging: false,
+                destroy: true,
+                bSort: false,
+                dom: 'Bfrtip',
+                buttons:[
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    {
+                        text: "Tắt Tự Động Cập Nhật",
+                        className: 'btn-danger',
+                        action: function (e, dt, node, config) {
+                            clearInterval(theInterval);
+                            $('#data').DataTable().destroy();
+                            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th></th> <th>Số Thứ Tự</th> <th>ID Nhóm Facebook</th> <th>ID Bài Đăng</th> <th>ID Người Đăng</th> <th>Nội Dung</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Số Lươt Thích</th> <th>Số Bình Luận</th> <th>Số Lươt Chia Sẻ</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>')
+                            changeToServerSide();
+                        },
+                    },
+                ]
+            });
+            $('#data').DataTable().clear().draw();
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-primary');
+            }, 100);
+
+            theInterval = setInterval(function(){ 
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/facebook-post-job-auto-data/',
+                    data: {
+                        "timestamp": parseInt(currentTimestamp)
+                    },
+                    success: function (response) {
+
+                        $('#data').DataTable().clear().draw();
+
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'success',
+                                    background: '#1b998b',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+                        for (i = 0; i < response.data.length; i++) {
+                            $('#data').dataTable().fnAddData([
+                                '',
+                                response.data[i]["id"],
+                                response.data[i]["group_id"],
+                                response.data[i]["post_id"],
+                                response.data[i]["post_user_id"],
+                                response.data[i]["post_message"],
+                                response.data[i]["post_image_link"],
+                                response.data[i]["post_image_alt"],
+                                response.data[i]["post_total_reactions"],
+                                response.data[i]["post_total_comments"],
+                                response.data[i]["post_total_shares"],
+                                moment.unix(response.data[i]["timestamp"]).format("DD/MM/YYYY HH:mm:ss"),
+                                moment.unix(response.data[i]["created_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                                moment.unix(response.data[i]["updated_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                            ]);
+                        }
+
+                        $('#data').DataTable().order([1, 'asc']).draw();
+                        $('#data').DataTable().order([0, 'asc']).draw();
+                        
+                        // $('#data').DataTable().clear().draw();
+                    },
+                    error: (xhr) => {
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'error',
+                                    background: '#FA5151',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+
+                        notyf.open({
+                            type: 'error',
+                            message: 'Kết nối thất bại !!!'
+                        });
+                        
+                    },
+                });
+
+            }, 5000);
+
+        }
+
+        function changeToServerSide(){
+            var dt = $('#data').DataTable({
+                bInfo : false,
+                serverSide: true,
+                destroy: true,
+                order: [[ 4, "desc" ]],
+                search: {
+                    search: " "
+                },
+                sAjaxSource: "/facebook-post-job-show-data/",  // new url
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: 0,
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        },
+                        {
+                            targets: 6,
+                            width: "20000px",
+                        }
+                    ],
+                    columns: [
+                        {name: "checkbox", data: 0},
+                        {
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
+                        },
+                        {name: "id", data: 0},
+                        {name: "group_id", data: 1},
+                        {name: "post_id", data: 2},
+                        {name: "post_user_id", data: 3},
+                        {name: "post_messsage", data: 4},
+                        {name: "post_image_link", data: 5},
+                        {name: "post_image_alt", data: 6},
+                        {name: "post_total_reactions", data: 7},
+                        {name: "post_total_comments", data: 8},
+                        {name: "post_total_shares", data: 9},
+                        {name: "timestamp", data: 10, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "created_at", data: 11, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "updated_at", data: 12, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                refreshDatatable();
+                                dt.ajax.reload(null, true);
+                                setTimeout(function(){
+                                    refreshDatatable()
+                                }, 100);
+                            },
+                        },
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        {
+                            text: "Tự Động Cập Nhật",
+                            className: 'btn-warning',
+                            action: function (e, dt, node, config) {
+                                changeToClientSide();
+                            },
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: 'btn btn-danger',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ]
+            });
+
+            // Array to track the ids of the details displayed rows
+            var detailRows = [];
+            
+            $('#data tbody').on( 'click', 'tr td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = dt.row( tr );
+                var idx = $.inArray( tr.attr('id'), detailRows );
+
+                if ( row.child.isShown() ) {
+                    tr.removeClass( 'details' );
+                    row.child.hide();
+                    // Remove from the 'open' array
+                    detailRows.splice( idx, 1 );
+                }
+                else {
+                    console.log( row.data() )
+                }
+            } );
+
+            // On each draw, loop over the `detailRows` array and show any child rows
+            dt.on( 'draw', function () {
+                $.each( detailRows, function ( i, id ) {
+                    $('#'+id+' td.details-control').trigger( 'click' );
+                } );
+            } );
+
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+
+        }
+
+        $(document).ready(function () {
+            changeToServerSide()
+        });
+
+    function crawlFacebookPost(){
+        $("#trigger-button").attr("disabled", true);
+
+            $("#trigger-button").html('<i class="fas fa-sync fa-spin"></i>');
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-post-job-get-data/',
+                data: {},
+                success: function (response) {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã gửi lệnh quét thành công. Xin tải lại bảng dữ liệu hoặc bật chế độ thời gian thực để kiểm tra dữ liệu đang được quét'
+                    });
+
+                    setTimeout(function(){
+                        $("#trigger-button").attr("disabled", false);
+                        $("#trigger-button").html('Quét Dữ Liệu');
+                    }, 5000);
+
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'error',
+                        message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                    });
+                    $("#trigger-button").attr("disabled", false);
+                    $("#trigger-button").html('Quét Dữ Liệu');
+                },
+            });
+    }
+
+    </script>
+
+    <script src="/static/assets/js/jquery.json-viewer.js"></script>
+    
+{% endblock javascripts %}

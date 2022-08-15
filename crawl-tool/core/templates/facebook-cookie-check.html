@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Kiểm Tra Facebook Cookie</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Kiểm Tra Facebook Cookie</h1>
+                  <p class="mb-0">Kiểm tra cookie đang sử dụng còn hợp lệ hay không.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#cookie" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Kiểm Tra Facebook Cookie</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-4" id="check-facebook">
+                    
+                </div>
+            </div>
+      </div>
+      
+      {% include 'includes/footer.html' %}
+
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            // Check Facebook Login
+
+            $("#check-facebook").html('<h4 class="h3">Đang kiểm tra cookie <i class="fas fa-spinner fa-pulse"></i></h4>')
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-check-login/',
+                data: {
+                    "user_id": {{ request.user.id }}
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        duration: 0,
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Cookie Facebook đã login thành công !!!'
+                    });
+
+                    $("#check-facebook").html('<div class="col-xl-6" style="padding-bottom: 2em"> <form id="upload-form" method="post" enctype="multipart/form-data" action="/facebook-upload-file/" class="mt-4"> {% csrf_token %}  <div class="mb-4"><div class="form-file mb-3"> <input name="user_id" type=hidden value="{{ request.user.id }}" > <input onchange="changeFileName(this)" type="file" class="form-file-input" name="file" id="customFile"> <label class="form-file-label" for="customFile"><span class="form-file-text" id="file-name">Làm mới cookie...</span> <span class="form-file-button">Tìm Kiếm</span></label><small id="numberHelp" class="form-text text-muted">Tải lên cookie hợp lệ dưới định dạng JSON.</small></div></div> </form> </div><div class="col-xl-3" style="display: flex; align-items: center; justify-content: center;"> <button id="trigger-button" class="btn btn-lg btn-gray" style="margin-top: -2.75em;" onclick="$(\'#upload-form\').submit()" >Quét Dữ Liệu </button> </div>');
+                    
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        duration: 0,
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Cookie không hợp lệ, xin vui lòng làm mới !!!'
+                    });
+
+                    $("#check-facebook").html('<div class="col-xl-6" style="padding-bottom: 2em"> <form id="upload-form" method="post" enctype="multipart/form-data" action="/facebook-upload-file/" class="mt-4"> {% csrf_token %}  <div class="mb-4"><div class="form-file mb-3"> <input name="user_id" type=hidden value="{{ request.user.id }}" > <input onchange="changeFileName(this)" type="file" class="form-file-input" name="file" id="customFile"> <label class="form-file-label" for="customFile"><span class="form-file-text" id="file-name">Làm mới cookie...</span> <span class="form-file-button">Tìm Kiếm</span></label><small id="numberHelp" class="form-text text-muted">Tải lên cookie hợp lệ dưới định dạng JSON.</small></div></div> </form> </div><div class="col-xl-3" style="display: flex; align-items: center; justify-content: center;"> <button id="trigger-button" class="btn btn-lg btn-gray" style="margin-top: -2.75em;" onclick="$(\'#upload-form\').submit()" >Kiểm Tra </button> </div>');
+                    
+                },
+            });
+
+        });
+
+    function changeFileName(node){
+        $('#file-name').text(node.value.split('\\')[node.value.split('\\').length-1]);
+    }
+
+    </script>
+    
+{% endblock javascripts %}

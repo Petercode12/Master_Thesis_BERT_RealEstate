@@ -1,0 +1,426 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+    <style>
+        
+    </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/facebook-post-scraper">Facebook Post Scraper</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Facebook Comment Scraper</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Facebook Comment Scraper</h1>
+                  <p class="mb-0">Thống kê danh sách bình luận của những bài đăng Facebook đã quét.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#fbp" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Facebook Comment Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            
+      </div>
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive" id="table-wrapper">
+                <table id="data" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>ID Bài Đăng</th>
+                            <th>ID Tài Khoản Bình Luận</th>
+                            <th>ID Tài Khoản Được Trả Lời</th>
+                            <th>Nội Dung Bình Luận</th>
+                            <th>Số Lượt Thích</th>
+                            <th>Ảnh Liên Kết</th>
+                            <th>Chú Thích</th>
+                            <th>Người Được Tag</th>
+                            <th>Link Người Tag</th>
+                            <th>Link Đính Kèm</th>
+                            <th>Thời Gian Đăng</th>
+                            <th>Ngày Khởi Tạo</th>
+                            <th>Ngày Cập Nhật</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>ID Bài Đăng</th>
+                            <th>ID Tài Khoản Bình Luận</th>
+                            <th>ID Tài Khoản Được Trả Lời</th>
+                            <th>Nội Dung Bình Luận</th>
+                            <th>Số Lượt Thích</th>
+                            <th>Ảnh Liên Kết</th>
+                            <th>Chú Thích</th>
+                            <th>Người Được Tag</th>
+                            <th>Link Người Tag</th>
+                            <th>Link Đính Kèm</th>
+                            <th>Thời Gian Đăng</th>
+                            <th>Ngày Khởi Tạo</th>
+                            <th>Ngày Cập Nhật</th>
+                        </tr>
+                    </tfoot>
+                </table>
+              </div>
+          </div>
+      </div>
+
+      {% include 'includes/footer.html' %}
+
+
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+        
+        currentTimestamp = parseInt(moment().unix());
+        theInterval = null;
+
+        function deleteDatatableRecords(){
+
+            id_array = [];
+
+            $( ".odd" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $( ".even" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[2].innerHTML); 
+                } 
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '/facebook-comment-delete-data/',
+                data: {
+                    "id_array": id_array.join(','),
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã xóa thành công !!!'
+                    });
+                    
+                    $('#data').DataTable().clear().draw();
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Xóa thất bại hoặc bạn chưa chọn dữ liệu để xóa !!!'
+                    });
+                    
+                },
+            });
+        }
+
+        function refreshDatatable(){
+            $('.table-responsive').toggle();
+        }
+
+        function changeToClientSide(){
+            $('#data').DataTable().destroy();
+            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th>Số Thứ Tự</th> <th>ID Bài Đăng</th> <th>ID Tài Khoản Bình Luận</th> <th>ID Tài Khoản Được Trả Lời</th> <th>Nội Dung Bình Luận</th> <th>Số Lượt Thích</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Người Được Tag</th> <th>Link Người Tag</th> <th>Link Đính Kèm</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th>Số Thứ Tự</th> <th>ID Bài Đăng</th> <th>ID Tài Khoản Bình Luận</th> <th>ID Tài Khoản Được Trả Lời</th> <th>Nội Dung Bình Luận</th> <th>Số Lượt Thích</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Người Được Tag</th> <th>Link Người Tag</th> <th>Link Đính Kèm</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>');
+            $('#data').DataTable({
+                bInfo : false,
+                serverSide: false,
+                searching: false,
+                paging: false,
+                destroy: true,
+                bSort: false,
+                dom: 'Bfrtip',
+                buttons:[
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    {
+                        text: "Tắt Tự Động Cập Nhật",
+                        className: 'btn-danger',
+                        action: function (e, dt, node, config) {
+                            clearInterval(theInterval);
+                            $('#data').DataTable().destroy();
+                            $('#table-wrapper').html('<table id="data" class="display" style="width:100%;"> <thead> <tr> <th></th> <th>Số Thứ Tự</th> <th>ID Bài Đăng</th> <th>ID Tài Khoản Bình Luận</th> <th>ID Tài Khoản Được Trả Lời</th> <th>Nội Dung Bình Luận</th> <th>Số Lượt Thích</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Người Được Tag</th> <th>Link Người Tag</th> <th>Link Đính Kèm</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </thead> <tfoot> <tr> <th></th> <th>Số Thứ Tự</th> <th>ID Bài Đăng</th> <th>ID Tài Khoản Bình Luận</th> <th>ID Tài Khoản Được Trả Lời</th> <th>Nội Dung Bình Luận</th> <th>Số Lượt Thích</th> <th>Ảnh Liên Kết</th> <th>Chú Thích</th> <th>Người Được Tag</th> <th>Link Người Tag</th> <th>Link Đính Kèm</th> <th>Thời Gian Đăng</th> <th>Ngày Khởi Tạo</th> <th>Ngày Cập Nhật</th> </tr> </tfoot> </table>')
+                            changeToServerSide();
+                        },
+                    },
+                ]
+            });
+            $('#data').DataTable().clear().draw();
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-primary');
+            }, 100);
+
+            theInterval = setInterval(function(){ 
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/facebook-comment-auto-data/',
+                    data: {
+                        "timestamp": parseInt(currentTimestamp)
+                    },
+                    success: function (response) {
+
+                        $('#data').DataTable().clear().draw();
+
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'success',
+                                    background: '#1b998b',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+                        
+                        // notyf.open({
+                        //     type: 'success',
+                        //     message: 'Có dữ liệu mới !!!'
+                        // });
+
+                        for (i = 0; i < response.data.length; i++) {
+                            $('#data').dataTable().fnAddData([
+                                '',
+                                response.data[i]["id"],
+                                response.data[i]["post_id"],
+                                response.data[i]["post_comment_user_id"],
+                                response.data[i]["post_comment_parent_id"],
+                                response.data[i]["post_message"],
+                                response.data[i]["post_total_reactions"],
+                                response.data[i]["post_image_link"],
+                                response.data[i]["post_image_alt"],
+                                response.data[i]["post_tags"],
+                                response.data[i]["post_links"],
+                                response.data[i]["post_attach_link"],
+                                response.data[i]["timestamp"],
+                                moment.unix(response.data[i]["created_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                                moment.unix(response.data[i]["updated_at"]).format("DD/MM/YYYY HH:mm:ss"),
+                            ]);
+                        }
+
+                        $('#data').DataTable().order([1, 'asc']).draw();
+                        $('#data').DataTable().order([0, 'asc']).draw();
+                        
+                        // $('#data').DataTable().clear().draw();
+                    },
+                    error: (xhr) => {
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'error',
+                                    background: '#FA5151',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+
+                        notyf.open({
+                            type: 'error',
+                            message: 'Kết nối thất bại !!!'
+                        });
+                        
+                    },
+                });
+
+            }, 5000);
+
+        }
+
+        function changeToServerSide(){
+            var dt = $('#data').DataTable({
+                bInfo : false,
+                serverSide: true,
+                destroy: true,
+                order: [[ 4, "desc" ]],
+                search: {
+                    search: " "
+                },
+                sAjaxSource: "/facebook-comment-show-data/",  // new url
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: 0,
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        },
+                        {
+                            targets: 6,
+                            width: "20000px",
+                        }
+                    ],
+                    columns: [
+                        {name: "checkbox", data: 0},
+                        {name: "id", data: 0},
+                        {name: "post_id", data: 1},
+                        {name: "post_comment_user_id", data: 2},
+                        {name: "post_comment_parent_id", data: 3},
+                        {name: "post_message", data: 4},
+                        {name: "post_total_reactions", data: 5},
+                        {name: "post_image_link", data: 6},
+                        {name: "post_image_alt", data: 7},
+                        {name: "post_tags", data: 8},
+                        {name: "post_links", data: 9},
+                        {name: "post_attach_link", data: 10},
+                        {name: "timestamp", data: 11, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "created_at", data: 12, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                        {name: "updated_at", data: 13, render: function (data, type, row) {
+                                return moment.unix(data).format("DD/MM/YYYY HH:mm:ss");
+                            }
+                        },
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                refreshDatatable();
+                                dt.ajax.reload(null, true);
+                                setTimeout(function(){
+                                    refreshDatatable()
+                                }, 100);
+                            },
+                        },
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        {
+                            text: "Tự Động Cập Nhật",
+                            className: 'btn-warning',
+                            action: function (e, dt, node, config) {
+                                changeToClientSide();
+                            },
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: '',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ]
+            });
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+
+        }
+
+        $(document).ready(function () {
+            changeToServerSide()
+        });
+
+    </script>
+
+    <script src="/static/assets/js/jquery.json-viewer.js"></script>
+    
+{% endblock javascripts %}

@@ -1,0 +1,493 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <main class="content">
+
+      {% include 'includes/navigation.html' %}
+
+      <div class="py-4">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                  <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Google Scraper</li>
+              </ol>
+          </nav>
+          <div class="d-flex justify-content-between w-100 flex-wrap">
+              <div class="mb-3 mb-lg-0">
+                  <h1 class="h4">Google Scrapers</h1>
+                  <p class="mb-0">Nhập từ khóa tìm kiếm và lấy toàn bộ tiêu đề cùng đường dẫn trang liên kết tùy theo số trang cần quét.</p>
+              </div>
+              <div>
+                  <a href="/doc-start/#google" target="_blank" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Tài Liệu Về Google Scraper</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-xl-4">
+                        <div class="mb-4">
+                            <label for="text">Từ Khóa</label>
+                            <input type="text" class="form-control" id="search_keyword" placeholder="Ví dụ: Bất động sản TPHCM" aria-describedby="textHelp">
+                            <small id="textHelp" class="form-text text-muted">Nhập từ khóa về nội dung liên quan cần quét.</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2">
+                        <div class="mb-4">
+                            <label for="number">Số Trang</label>
+                            <input type="number" class="form-control" id="end_page" placeholder="Ví dụ: 5" aria-describedby="textHelp">
+                            <small id="numberHelp" class="form-text text-muted">Nhập số trang cần quét.</small>
+                        </div>
+                    </div>
+                    <div class="col-xl-2" style="display: flex; align-items: center; justify-content: center;">
+                        <button id="trigger-button" onclick="crawlGoogle($('#search_keyword').val(),$('#end_page').val())" class="btn btn-lg btn-secondary" style="margin-top: -0.75em;" type="button">Quét Dữ Liệu</button>
+                    </div>
+                </div>
+            </div>
+      </div>
+      <div class="card border-light shadow-sm">
+          <div class="card-body">
+              <div class="table-responsive">
+                <table id="data" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>Từ Khóa</th>
+                            <th>Tiêu Đề</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Thời Gian</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Số Thứ Tự</th>
+                            <th>Từ Khóa</th>
+                            <th>Tiêu Đề</th>
+                            <th>Đường Liên Kết</th>
+                            <th>Thời Gian</th>
+                        </tr>
+                    </tfoot>
+                </table>
+              </div>
+          </div>
+      </div>
+      
+      {% include 'includes/footer.html' %}
+
+  </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    {% csrf_token %}
+    <script type="text/javascript">
+
+        
+        currentTimestamp = parseInt(moment().unix());
+        theInterval = null;
+
+        function deleteDatatableRecords(){
+
+            id_array = [];
+
+            $( ".odd" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[1].innerHTML); 
+                } 
+            });
+
+            $( ".even" ).each(function( index ) {
+                if ($(this).find("input[type=checkbox]").is(":checked")) { 
+                    id_array.push($(this).find("td")[1].innerHTML); 
+                } 
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '/google-delete-data/',
+                data: {
+                    "id_array": id_array.join(','),
+                },
+                success: function (response) {
+
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã xóa thành công !!!'
+                    });
+                    
+                    $('#data').DataTable().clear().draw();
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+
+                    notyf.open({
+                        type: 'error',
+                        message: 'Xóa thất bại hoặc bạn chưa chọn dữ liệu để xóa !!!'
+                    });
+                    
+                },
+            });
+        }
+
+        function refreshDatatable(){
+            $('.table-responsive').toggle();
+        }
+
+        function changeToClientSide(){
+            $('#data').DataTable().destroy();
+            $('#data').DataTable({
+                serverSide: false,
+                searching: false,
+                paging: false,
+                destroy: true,
+                bSort: false,
+                dom: 'Bfrtip',
+                buttons:[
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    {
+                        text: "Tắt Tự Động Cập Nhật",
+                        className: 'btn-danger',
+                        action: function (e, dt, node, config) {
+                            clearInterval(theInterval);
+                            $('#data').DataTable().destroy();
+                            changeToServerSide();
+                        },
+                    },
+                ]
+            });
+            $('#data').DataTable().clear().draw();
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-primary');
+            }, 100);
+
+            theInterval = setInterval(function(){ 
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/google-auto-data/',
+                    data: {
+                        "timestamp": parseInt(currentTimestamp)
+                    },
+                    success: function (response) {
+
+                        $('#data').DataTable().clear().draw();
+
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'success',
+                                    background: '#1b998b',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+                        
+                        // notyf.open({
+                        //     type: 'success',
+                        //     message: 'Có dữ liệu mới !!!'
+                        // });
+
+                        for (i = 0; i < response.data.length; i++) {
+                            $('#data').dataTable().fnAddData([
+                                '',
+                                response.data[i]["id"],
+                                response.data[i]["keyword"],
+                                response.data[i]["title"],
+                                response.data[i]["link"],
+                                response.data[i]["datetime"]
+                            ]);
+                        }
+
+                        $('#data').DataTable().order([1, 'asc']).draw();
+                        $('#data').DataTable().order([0, 'asc']).draw();
+                        
+                        // $('#data').DataTable().clear().draw();
+                    },
+                    error: (xhr) => {
+                        const notyf = new Notyf({
+                            position: {
+                                x: 'right',
+                                y: 'top',
+                            },
+                            ripple: true,
+                            types: [
+                                {
+                                    type: 'error',
+                                    background: '#FA5151',
+                                    icon: {
+                                        className: '',
+                                        tagName: 'span',
+                                        color: '#fff'
+                                    },
+                                    dismissible: true,
+                                }
+                            ]
+                        });
+
+                        notyf.open({
+                            type: 'error',
+                            message: 'Kết nối thất bại !!!'
+                        });
+                        
+                    },
+                });
+
+            }, 5000);
+
+        }
+
+        function changeToServerSide(){
+            $('#data').DataTable({
+                serverSide: true,
+                destroy: true,
+                order: [[ 5, "desc" ]],
+                search: {
+                    search: " "
+                },
+                sAjaxSource: "/google-show-data/",  // new url
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            width: 100,
+                            checkboxes: {
+                                selectRow: true
+                            }
+                        }
+                    ],
+                    columns: [
+                        {name: "checkbox", data: 0},
+                        {name: "id", data: 0},
+                        {name: "keyword", data: 1},
+                        {name: "title", data: 2},
+                        {name: "link", data: 3},
+                        {name: "datetime", data: 4},
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: "Cập Nhật",
+                            className: 'btn-primary',
+                            action: function (e, dt, node, config) {
+                                refreshDatatable();
+                                dt.ajax.reload(null, true);
+                                setTimeout(function(){
+                                    refreshDatatable()
+                                }, 100);
+                            },
+                        },
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        {
+                            text: "Tự Động Cập Nhật",
+                            className: 'btn-warning',
+                            action: function (e, dt, node, config) {
+                                changeToClientSide();
+                            },
+                        },
+                        {
+                            text: "Xóa Dữ Liệu Đã Chọn",
+                            className: '',
+                            action: function (e, dt, node, config) {
+                                if (window.confirm("Bạn có chắn chắn muốn xóa?")) {
+                                    deleteDatatableRecords();
+                                }
+                            },
+                        },
+                    ]
+            });
+
+            setTimeout(function(){
+                $('.dt-buttons button').removeClass('dt-button').addClass('btn btn-sm');
+                $('.buttons-copy').addClass('btn btn-sm btn-info');
+                $('.buttons-excel').addClass('btn btn-sm btn-tertiary');
+                $('.buttons-csv').addClass('btn btn-sm btn-success');
+                $('.buttons-pdf').addClass('btn btn-sm btn-danger');
+            }, 100);
+
+        }
+
+        $(document).ready(function () {
+            changeToServerSide()
+        });
+
+    function crawlGoogle(search_keyword,end_page){
+
+        if (search_keyword == '' || end_page == ''){
+
+            const notyf = new Notyf({
+                    position: {
+                        x: 'right',
+                        y: 'top',
+                    },
+                    ripple: true,
+                    types: [
+                        {
+                            type: 'error',
+                            background: '#FA5151',
+                            icon: {
+                                className: '',
+                                tagName: 'span',
+                                color: '#fff'
+                            },
+                            dismissible: true,
+                        }
+                    ]
+                });
+                notyf.open({
+                    type: 'error',
+                    message: 'Vui lòng nhập đầy đủ thông số tìm kiếm !!!'
+                });
+                $("#trigger-button").attr("disabled", false);
+                $("#trigger-button").html('Quét Dữ Liệu');
+
+        }
+
+        else{
+
+            $("#trigger-button").attr("disabled", true);
+
+            $("#trigger-button").html('<i class="fas fa-sync fa-spin"></i>');
+
+            $.ajax({
+                type: 'POST',
+                url: '/google-get-data/',
+                data: {
+                    "search_keyword": search_keyword,
+                    "end_page": end_page
+                },
+                success: function (response) {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'success',
+                                background: '#1b998b',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'success',
+                        message: 'Đã gửi lệnh quét thành công. Xin tải lại bảng dữ liệu hoặc bật chế độ thời gian thực để kiểm tra dữ liệu đang được quét'
+                    });
+
+                    setTimeout(function(){
+                        $("#trigger-button").attr("disabled", false);
+                        $("#trigger-button").html('Quét Dữ Liệu');
+                    }, 5000);
+
+                },
+                error: (xhr) => {
+                    const notyf = new Notyf({
+                        position: {
+                            x: 'right',
+                            y: 'top',
+                        },
+                        ripple: true,
+                        types: [
+                            {
+                                type: 'error',
+                                background: '#FA5151',
+                                icon: {
+                                    className: '',
+                                    tagName: 'span',
+                                    color: '#fff'
+                                },
+                                dismissible: true,
+                            }
+                        ]
+                    });
+                    notyf.open({
+                        type: 'error',
+                        message: 'Lỗi ' + String(xhr.statusText) + ':' + String(xhr.responseJSON) + '<br><br>Xin vui lòng thử lại hoặc liên hệ với bên kĩ thuật'
+                    });
+                    $("#trigger-button").attr("disabled", false);
+                    $("#trigger-button").html('Quét Dữ Liệu');
+                },
+            });
+
+        }
+
+    }
+
+    </script>
+    
+{% endblock javascripts %}
