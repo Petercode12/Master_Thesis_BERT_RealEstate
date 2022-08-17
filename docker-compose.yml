@@ -3,7 +3,7 @@ services:
   splash:
     image: scrapinghub/splash
     ports:
-      - ${VPN_PORT}:${VPN_PORT}
+      - ${SPLASH_PORT}:${SPLASH_PORT}
     container_name: ${SPLASH_CONTAINER}
     restart: unless-stopped
     command: --max-timeout 60
@@ -46,8 +46,8 @@ services:
     restart: always
     env_file: .env
     build: 
-      context: .
-      dockerfile: crawl-tool/Dockerfile
+      context: ./crawl-tool
+      dockerfile: ./Dockerfile
     container_name: django-web
     command: bash -c ". /opt/env/bin/activate && service cron start && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py createsuperuser_if_none_exists --user=admin --password=admin && gunicorn --config gunicorn-cfg.py core.wsgi"
     # command: bash -c ". /opt/env/bin/activate && python3 manage.py migrate && python3 manage.py createsuperuser_if_none_exists --user=admin --password=admin && gunicorn --config gunicorn-cfg.py core.wsgi"
