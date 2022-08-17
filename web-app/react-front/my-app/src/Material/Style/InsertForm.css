@@ -1,0 +1,9 @@
+.required:after {
+  content: " *";
+  color: red;
+}
+
+.btn {
+  float: right;
+  margin: 4px 4px;
+}

@@ -1,0 +1,52 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.bg-image {
+  background-image: url("https://images.theconversation.com/files/128248/original/image-20160627-28391-1f87m7g.jpeg?ixlib=rb-1.1.0&q=45&auto=format&w=1200&h=1200.0&fit=crop");
+  background-size: cover;
+  background-position: center;
+  filter: blur(0px);
+}
+
+.container {
+  margin: 0 auto;
+}
+
+.wrap-box {
+  backdrop-filter: none;
+  border-radius: 15px;
+  padding: 30px 20px;
+  margin: auto;
+  background: rgba(0, 0, 0, 0.13);
+  backdrop-filter: blur(4px);
+  text-shadow: 2px rgb(231, 231, 231);
+  color: white;
+}
+
+.login {
+  min-height: 100vh;
+}
+
+.login-heading {
+  font-weight: 300;
+}
+.btn-login {
+  font-size: 0.9rem;
+  letter-spacing: 0.05rem;
+  padding: 0.75rem 1rem;
+  border-radius: 20px !important;
+}
+.invalid {
+  border-color: red !important;
+}
+
+.form-floating > .form-control {
+  border-radius: 20px !important;
+}
+
+.row-header {
+  color: black;
+}

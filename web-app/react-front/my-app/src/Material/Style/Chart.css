@@ -1,0 +1,20 @@
+#chart {
+  margin-top: 2em;
+}
+
+#lineChart {
+  float: left;
+  width: 50%;
+}
+
+#barChart {
+  float: left;
+  width: 50%;
+}
+
+#pieChart {
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  padding-left: 12em;
+}
