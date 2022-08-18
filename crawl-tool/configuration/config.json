@@ -9,7 +9,7 @@
     "postgres": {
         "user": "tdung", //"admin",
         "password": "8M44Ck48wn3J", //"admin",
-        "password": "8M44Ck48wn3J",// "crawler-postgres",
+        "host": "129.146.248.20",// "crawler-postgres",
         "port": 5432,
         "database": "ttndung"
     },
