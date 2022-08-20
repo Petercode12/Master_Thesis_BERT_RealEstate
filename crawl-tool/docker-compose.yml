@@ -10,37 +10,36 @@ services:
     networks:
       - crawler_network
 
-  # mongodb:
-  #   image: mongo:4.4
-  #   container_name: ${MONGO_CONTAINER}
-  #   restart: unless-stopped
-  #   ports:
-  #     - ${MONGO_PORT}:${MONGO_PORT}
-  #   environment:
-  #     # - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-  #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-  #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-  #   volumes:
-  #     - "candelete-mongodb:/data/db"
-  #   networks:
-  #     - crawler_network
+  mongodb:
+    image: mongo:4.4
+    container_name: ${MONGO_CONTAINER}
+    restart: unless-stopped
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - "candelete-mongodb:/data/db"
+    networks:
+      - crawler_network
 
-  # postgresdb:
-  #   image: postgres:latest
-  #   container_name: ${POSTGRES_CONTAINER}
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-  #   environment:
-  #     POSTGRES_HOST_AUTH_METHOD: trust
-  #     POSTGRES_HOST: ${POSTGRES_HOST}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #   volumes:
-  #     - "donotdelete-postgres:/var/lib/postgresql/data"
-  #   networks:
-  #     - crawler_network
+  postgresdb:
+    image: postgres:latest
+    container_name: ${POSTGRES_CONTAINER}
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - "donotdelete-postgres:/var/lib/postgresql/data"
+    networks:
+      - crawler_network
   
   appseed-app:
     restart: always
@@ -48,7 +47,6 @@ services:
     build: .
     container_name: django-web
     command: bash -c ". /opt/env/bin/activate && service cron start && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py createsuperuser_if_none_exists --user=admin --password=admin && gunicorn --config gunicorn-cfg.py core.wsgi"
-    # command: bash -c ". /opt/env/bin/activate && python3 manage.py migrate && python3 manage.py createsuperuser_if_none_exists --user=admin --password=admin && gunicorn --config gunicorn-cfg.py core.wsgi"
     ports:
       - "5005:5005"
     volumes:
@@ -65,8 +63,6 @@ services:
     restart: always
     container_name: django-nginx
     image: "nginx:latest"
-    # ports:
-    #   - "80:80"
     volumes:
       - ./nginx:/etc/nginx/conf.d
     networks:
@@ -80,7 +76,5 @@ volumes:
 
 networks:
   crawler_network: null
-  # db_network:
-  #   driver: bridge
   web_network:
     driver: bridge

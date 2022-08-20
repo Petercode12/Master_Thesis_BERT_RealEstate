@@ -1,8 +1,8 @@
 {
     "mongo": {
         "user": "admin",
-        "password": "8M44Ck48wn3J",
-        "host": "129.146.248.20",
+        "password": "admin",
+        "host": "crawler-mongo",
         "port": 27017,
         "database": "ttndung"
     },
