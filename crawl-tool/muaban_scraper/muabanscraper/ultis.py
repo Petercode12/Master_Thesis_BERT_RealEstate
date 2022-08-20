@@ -225,40 +225,40 @@ def queryTimes(connection):
   cursor.execute(query)
   keyword_times = cursor.fetchall()
   print(keyword_times)
-  all_estate_type =[
-    "Mua bán Nhà mặt tiền, phố",
-    "Mua bán Nhà hẻm, ngõ",
-    "Mua bán Biệt thự, Villa, Penthouse",
-    "Mua bán Chung cư",
-    "Mua bán Penthouse",
-    "Mua bán Căn hộ dịch vụ, mini",
-    "Mua bán Tập thể, cư xá",
-    "Mua bán Officetel",
-    "Mua bán Đất dự án, Khu dân cư",
-    "Mua bán Đất thổ cư",
-    "Mua bán Đất nông nghiệp, kho bãi",
+  # all_estate_type =[
+  #   "Mua bán Nhà mặt tiền, phố",
+  #   "Mua bán Nhà hẻm, ngõ",
+  #   "Mua bán Biệt thự, Villa, Penthouse",
+  #   "Mua bán Chung cư",
+  #   "Mua bán Penthouse",
+  #   "Mua bán Căn hộ dịch vụ, mini",
+  #   "Mua bán Tập thể, cư xá",
+  #   "Mua bán Officetel",
+  #   "Mua bán Đất dự án, Khu dân cư",
+  #   "Mua bán Đất thổ cư",
+  #   "Mua bán Đất nông nghiệp, kho bãi",
 
-    "Cho thuê Biệt thự, Villa",
-    "Cho thuê Nhà mặt tiền",
-    "Cho thuê Nhà hẻm ngõ",
-    "Cho thuê Chung cư",
-    "Cho thuê Penthouse",
-    "Cho thuê Khách sạn, Căn hộ dịch vụ",
-    "Cho thuê Tập thể, cư xá",
-    "Cho thuê Officetel",
-    "Cho thuê Nhà trọ, Phòng trọ",
-    "Cho thuê Văn phòng",
-    "Cho thuê Mặt bằng kinh doanh",
-    "Cho thuê Cửa hàng, shophouse",
-    "Cho thuê Officetel",
-    "Cho thuê Nhà xưởng, nhà kho",
-    "Cho thuê Bãi để xe",
-    "Cho thuê Đất trống"
-  ]
-  job_id_times = {i:None for i in all_estate_type}
-  for x, y in keyword_times:
-    job_id_times[x] = y
-  return job_id_times
+  #   "Cho thuê Biệt thự, Villa",
+  #   "Cho thuê Nhà mặt tiền",
+  #   "Cho thuê Nhà hẻm ngõ",
+  #   "Cho thuê Chung cư",
+  #   "Cho thuê Penthouse",
+  #   "Cho thuê Khách sạn, Căn hộ dịch vụ",
+  #   "Cho thuê Tập thể, cư xá",
+  #   "Cho thuê Officetel",
+  #   "Cho thuê Nhà trọ, Phòng trọ",
+  #   "Cho thuê Văn phòng",
+  #   "Cho thuê Mặt bằng kinh doanh",
+  #   "Cho thuê Cửa hàng, shophouse",
+  #   "Cho thuê Officetel",
+  #   "Cho thuê Nhà xưởng, nhà kho",
+  #   "Cho thuê Bãi để xe",
+  #   "Cho thuê Đất trống"
+  # ]
+  # job_id_times = {i:None for i in all_estate_type}
+  # for x, y in keyword_times:
+  #   job_id_times[x] = y
+  # return job_id_times
 
 def save_statistic(time, num_post, connection):
   cursor = connection.cursor()

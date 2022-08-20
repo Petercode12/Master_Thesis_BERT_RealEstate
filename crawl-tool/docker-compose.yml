@@ -55,8 +55,8 @@ services:
       - .:/code
     depends_on:
       - splash
-      - postgresdb
-      - mongodb
+      # - postgresdb
+      # - mongodb
     networks:
       - crawler_network
       - web_network

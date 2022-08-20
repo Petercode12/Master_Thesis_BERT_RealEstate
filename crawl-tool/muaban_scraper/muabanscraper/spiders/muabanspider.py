@@ -142,7 +142,7 @@ class MuabanSpider(scrapy.Spider):
             content.update(json_data)
             insertOne(content.json(), self.connection, 'app_muabannet_scraper')
 
-            with open(os.path.dirname(__file__) + '/../../data/data_muaban.csv', 'a', encoding='utf-8') as f:
+            with open(os.path.dirname(__file__) + '/../data/data_muaban.csv', 'a', encoding='utf-8') as f:
                 w = csv.writer(f)
                 w.writerow(json_data.values())
 
