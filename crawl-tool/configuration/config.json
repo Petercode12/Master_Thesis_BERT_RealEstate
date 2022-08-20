@@ -1,15 +1,15 @@
 {
     "mongo": {
-        "user": "tdung",
+        "user": "admin",
         "password": "8M44Ck48wn3J",
         "host": "129.146.248.20",
         "port": 27017,
         "database": "ttndung"
     },
     "postgres": {
-        "user": "tdung",
-        "password": "8M44Ck48wn3J",
-        "host": "129.146.248.20",
+        "user": "admin",
+        "password": "admin", 
+        "host": "crawler-postgres",
         "port": 5432,
         "database": "ttndung"
     },
