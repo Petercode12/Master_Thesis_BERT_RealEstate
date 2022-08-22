@@ -110,6 +110,8 @@ At this point, the app runs at `http://127.0.0.1:8000/`.
 $ virtualenv env
 $ source env/Scripts/activate
 $ pip3 install -r requirements.txt
+$ python -m pip install django-cors-headers
+$ pip install psycopg2
 ```
 
 <br />
