@@ -7,13 +7,14 @@ from django.http.response import JsonResponse
 from house.models import Houses
 from house.serializers import HouseSerializer
 
+import os
 
 @csrf_exempt
 def houseApi(request):
     if request.method == 'GET':
+        os.system("python import-data.py")
         houses = Houses.objects.all()
         houses_serializer = HouseSerializer(houses, many=True)
-
         return JsonResponse(houses_serializer.data, safe=False)
     elif request.method == 'POST':
         houses_data = JSONParser().parse(request)
