@@ -107,6 +107,7 @@ At this point, the app runs at `http://127.0.0.1:8000/`.
 > Install modules via `VENV` (windows)
 
 ```
+$ cd web-app
 $ virtualenv env
 $ source env/Scripts/activate
 $ pip3 install -r requirements.txt
