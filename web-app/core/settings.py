@@ -107,11 +107,16 @@ if os.environ.get('DB_ENGINE') and os.environ.get('DB_ENGINE') == "mysql":
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'data.db',
-        }
+        'default': {  
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',  
+        'NAME': 'ttndung',  
+        'USER': 'tdung',  
+        'PASSWORD': '8M44Ck48wn3J',  
+        'HOST': '129.146.248.20',  
+        'PORT': '5432'
+    }  
     }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
