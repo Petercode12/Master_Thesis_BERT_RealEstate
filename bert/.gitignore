@@ -1,0 +1,7 @@
+phobert
+# download from https://public.vinai.io/PhoBERT_base_transformers.tar.gz
+PhoBERT_base_transformers
+# git clone --depth=1 https://github.com/vncorenlp/VnCoreNLP
+VnCoreNLP
+resources/
+transformers/
