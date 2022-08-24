@@ -1,0 +1,12 @@
+torch
+transformers
+vncorenlp
+numpy
+pandas
+tensorflow
+keras_crf
+scikit-learn
+jsonlines
+tqdm
+fairseq
+matplotlib
