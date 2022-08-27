@@ -2,7 +2,7 @@
 
 ```bash
 $ # Open terminal
-$ cd react-front/my-app
+$ cd web-app/react-front/my-app
 $ npm install [<lacking packages> ...]
 $ npm start
 ```
