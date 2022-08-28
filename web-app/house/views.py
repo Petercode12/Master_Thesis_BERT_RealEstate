@@ -53,7 +53,7 @@ def houseApi(request):
 def delete_house(request, id):
     if request.method == "POST":
         if id is not None and id != "": 
-            print(id) 
+            print(id)
             connection = psycopg2.connect(
                 host="129.146.248.20",
                 port="5432", #default
@@ -78,3 +78,4 @@ def delete_house(request, id):
             else: 
                 return HttpResponse(status = 404)
             return HttpResponse(status = 200)
+    return HttpResponse(status = 400)
