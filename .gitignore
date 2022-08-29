@@ -33,5 +33,7 @@ staticfiles/*
 !staticfiles/.gitkeep 
 .vscode/symbols.json
 
+node_modules
+
 postgres-data
 data
