@@ -153,7 +153,7 @@ export default function InfoTable() {
 
   useEffect(() => {
     axios({
-      url: "http://127.0.0.1:8000/house/?page=1",
+      url: "http://127.0.0.1:8000/house/",
       method: "GET"
     })
       .then((res) => {
