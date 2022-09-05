@@ -51,7 +51,7 @@ tokens = tokenizer.convert_ids_to_tokens(input_ids)
 
 max_len = 200
 
-filename = 'NER/data/processed_data/labeled_dataset.jsonl'
+filename = 'NER/labeled_dataset.jsonl'
 processor = DatasetProcessor()
 processor.load_sentences(filename, max_len)
 sentences = processor.get_sentences()
