@@ -36,9 +36,7 @@ export default function InfoTable() {
 
   useEffect(() => {
     axios({
-      url: URLs_Collection.getData.concat(
-        `page=${pageIndex}&house_type=${houseType}&house_certificate=${houseCertificate}&house_owner=${houseOwner}&house_type_increase=${houseTypeIncrease}&house_address=${houseAddress}`
-      ),
+      url: "http://127.0.0.1:8000/house/",
       method: "GET",
     })
       .then((res) => {
@@ -54,25 +52,7 @@ export default function InfoTable() {
   console.log(posts);
   const pagePostsLimit = 8;
 
-  const handleFilterByType = () => {
-    const filterElementValue = document.getElementById("filterByType").value;
-    if (filterElementValue !== "select type") {
-      const filtered = posts.filter(
-        (post) => post.LoaiHinh === filterElementValue
-      );
-      setPosts(filtered);
-    }
-  };
-
-  const handleFilterByLicense = () => {
-    const filterElementValue = document.getElementById("filterByLicense").value;
-    if (filterElementValue !== "select license") {
-      const filtered = posts.filter(
-        (post) => post.ChungNhanSoHuu === filterElementValue
-      );
-      setPosts(filtered);
-    }
-  };
+  // Delete rows functions
   const removeElementById = (id) => {
     const postsAfterRemove = posts.filter((post) => post.house_id !== id);
     setPosts(postsAfterRemove);
@@ -102,26 +82,98 @@ export default function InfoTable() {
     );
   };
 
-  const searchHouseByOwner = () => {
+  // Filter functions
+  const handleFilter = () => {
+    let filteredPosts = posts;
+    const filterByTypeElementValue =
+      document.getElementById("filterByType").value;
+    const filterByLicenseElementValue =
+      document.getElementById("filterByLicense").value;
     const owner = document.getElementById("filterByName").value;
-    if (owner !== "") {
-      const filteredPosts = posts.filter((post) =>
-        post.TacGia.toLowerCase().includes(owner.toLowerCase())
-      );
-      setPosts(filteredPosts);
-    }
-  };
-
-  const searchHouseByAddress = () => {
     const address = document.getElementById("filterByAddress").value;
-    if (address !== "") {
-      const filteredPosts = posts.filter((post) =>
-        post.DiaChi.toLowerCase().includes(address.toLowerCase())
-      );
-      setPosts(filteredPosts);
+    if (filterByTypeElementValue !== "select type" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.LoaiHinh !== null) {
+          return post.LoaiHinh.toLowerCase().includes(
+            filterByTypeElementValue.toLowerCase()
+          );
+        }
+        return false;
+      });
     }
+    if (
+      filterByLicenseElementValue !== "select license" &&
+      filteredPosts !== null
+    ) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.ChungNhanSoHuu !== null) {
+          return post.ChungNhanSoHuu.toLowerCase().includes(
+            filterByLicenseElementValue.toLowerCase()
+          );
+        }
+        return false;
+      });
+    }
+    if (owner !== "" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.TacGia !== null) {
+          return post.TacGia.toLowerCase().includes(owner.toLowerCase());
+        }
+        return false;
+      });
+    }
+    if (address !== "" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.DiaChi !== null) {
+          return post.DiaChi.toLowerCase().includes(address.toLowerCase());
+        }
+        return false;
+      });
+    }
+    setPosts(filteredPosts);
   };
+  // const handleFilterByType = () => {
+  //   const filterElementValue = document.getElementById("filterByType").value;
+  //   if (filterElementValue !== "select type") {
+  //     const filtered = posts.filter((post) =>
+  //       post.LoaiHinh.toLowerCase().includes(filterElementValue.toLowerCase())
+  //     );
+  //     setPosts(filtered);
+  //   }
+  // };
 
+  // const handleFilterByLicense = () => {
+  //   const filterElementValue = document.getElementById("filterByLicense").value;
+  //   if (filterElementValue !== "select license") {
+  //     const filtered = posts.filter((post) =>
+  //       post.ChungNhanSoHuu.toLowerCase().includes(
+  //         filterElementValue.toLowerCase()
+  //       )
+  //     );
+  //     setPosts(filtered);
+  //   }
+  // };
+  // const searchHouseByOwner = () => {
+  //   const owner = document.getElementById("filterByName").value;
+  //   if (owner !== "") {
+  //     const filteredPosts = posts.filter((post) =>
+  //       post.TacGia.toLowerCase().includes(owner.toLowerCase())
+  //     );
+  //     setPosts(filteredPosts);
+  //   }
+  // };
+
+  // const searchHouseByAddress = () => {
+  //   const address = document.getElementById("filterByAddress").value;
+  //   if (address !== "") {
+  //     const filteredPosts = posts.filter((post) =>
+  //       post.DiaChi.toLowerCase().includes(address.toLowerCase())
+  //     );
+  //     setPosts(filteredPosts);
+  //   }
+  // };
+
+  // Extra functions for handling features
   const checkedBoxCount = (post) => {
     const box = document.querySelectorAll(
       ".house".concat(post.house_id.toString()).concat(" .form-check-input")
@@ -205,10 +257,11 @@ export default function InfoTable() {
               id="searchBtn"
               value={lang === en ? "Search" : "Rechercher un projet"}
               onClick={() => {
-                searchHouseByOwner();
-                searchHouseByAddress();
-                handleFilterByType();
-                handleFilterByLicense();
+                handleFilter();
+                // searchHouseByOwner();
+                // searchHouseByAddress();
+                // handleFilterByType();
+                // handleFilterByLicense();
               }}
             ></Button>
             <Button
