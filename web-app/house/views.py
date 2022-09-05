@@ -12,17 +12,25 @@ from house.serializers import HouseSerializer
 import os
 import psycopg2
 
+
+
 @csrf_exempt
 def houseApi(request):
     if request.method == 'GET':
-        os.system("python import-data.py")
         page_number = request.GET.get('page') #page is the page u want to get
+        if page_number == "1":
+            print("Joining tables in loadData ...")
+            os.system("python import-data.py")
+            print("End joining tables in loadData ...")
+            global houses
+            houses = Houses.objects.all()
+            print("After select all")
         house_type = request.GET.get('house_type') #house_type la loaihinh
         house_certificate = request.GET.get('house_certificate') #house_certificate la chung chi so huu
         house_owner = request.GET.get('house_owner') #house_owner la chu so huu
         house_address = request.GET.get('house_address') #house_address la dia chi nha
         house_type_increase = request.GET.get('house_type_increase') #house_type_increase la tang hay giam dan
-        houses = Houses.objects.all()
+        
         if house_type_increase is not None and house_type_increase != "":
             if house_type_increase == "True":
                 houses = houses.order_by('LoaiHinh')
@@ -38,9 +46,12 @@ def houseApi(request):
         if house_address is not None and house_address != "":
             houses = houses.filter(DiaChi__icontains=house_address)
         
-        paginator = Paginator (houses, 8) # 8 is the number of records per page
-        total_page = paginator.num_pages
+        paginator = Paginator(houses, 4) # 8 is the number of records per page
+        print("After paginator")
         houses_serializer = HouseSerializer(paginator.page(page_number), many=True)
+        print("After HouseSerializer: ", paginator.num_pages)
+        total_page = paginator.num_pages
+        print("After total_page")
         return JsonResponse({'total_page': total_page,'house_data': houses_serializer.data})
     elif request.method == 'POST':
         houses_data = JSONParser().parse(request)
@@ -78,3 +89,4 @@ def delete_house(request, id):
             else: 
                 return HttpResponse(status = 404)
             return HttpResponse(status = 200)
+    return HttpResponse(status = 400)

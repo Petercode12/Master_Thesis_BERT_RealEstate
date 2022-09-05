@@ -7,164 +7,50 @@ import ReactPaginate from "react-paginate";
 import { langContext } from "../App.js";
 import en from "../lang/en.js";
 import Translate from "react-translate-component";
+import URLs_Collection from "../Helper/URLs_Collection";
 
-const data = [
-  {
-    id: 1,
-    type: "Chung cư",
-    owner: "Ms Trinh",
-    price: "1400000000",
-    address:
-      "Đường Quốc Lộ 13, Phường Thuận Giao, Thành phố Thuận An, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 2,
-    type: "Chung cư",
-    owner: "minh an",
-    price: "200000000",
-    address: "Thành phố Thuận An, Bình Dương",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 3,
-    type: "Đất thổ cư",
-    owner: "nguyễn văn tịch",
-    price: "830000000",
-    address: "Đường Quốc Lộ 13, Xã Trừ Văn Thố, Huyện Bàu Bàng, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 4,
-    type: "Chung cư",
-    owner: "ngocnguyen.bds71@gmail.com",
-    price: "2640000000",
-    address:
-      "Đường Quốc Lộ 13, Phường Thuận Giao, Thành phố Thuận An, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 5,
-    type: "Nhà hẻm, ngõ",
-    owner: "HUỲNH GIAO",
-    price: "4500000",
-    address: "Đường dx140, Phường Tân An, Thành phố thủ Dầu Một, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 6,
-    type: "Chung cư",
-    owner: "C Xoan",
-    price: "1450000000",
-    address: "Đường Quốc Lộ 13, Phường Thuận Giác",
-    license: "Sổ hồng",
-  },
-  {
-    id: 7,
-    type: "Nhà hẻm, ngõ",
-    owner: "Tan Phuoc",
-    price: "1800000000",
-    address: "Đường Quốc Lộ 1, Phường Thuận Giác",
-    license: "Sổ hồng",
-  },
-  {
-    id: 8,
-    type: "Đất thổ cư",
-    owner: "Manh Hung",
-    price: "1210000000",
-    address: "Đường Quốc Lộ 8, Phường Tân Bình",
-    license: "Sổ hồng",
-  },
-  {
-    id: 9,
-    type: "Nhà xưởng, nhà kho",
-    owner: "Mrs. Dung",
-    price: "1400000000",
-    address: "Đường Quốc Lộ 13, Phường Bình Tân",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 10,
-    type: "Đất thổ cư",
-    owner: "Mrs. Phụng",
-    price: "1200000000",
-    address: "Xa lộ hà nội, TPHCM",
-    license: "Sổ hồng",
-  },
-  {
-    id: 11,
-    type: "Nhà xưởng, nhà kho",
-    owner: "Mr Khoi",
-    price: "1800000000",
-    address: "Phường Hòa Bình, Biên Hòa",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 12,
-    type: "Đất thổ cư",
-    owner: "Mr. Phan",
-    price: "1100000000",
-    address: "Phường Thanh Bình, Biên Hòa",
-    license: "Sổ hồng",
-  },
-  {
-    id: 13,
-    type: "Đất thổ cư",
-    owner: "Ms Loc",
-    price: "1200000000",
-    address: "Quận 10, TPHCM",
-    license: "Sổ hồng",
-  },
-  {
-    id: 14,
-    type: "Nhà hẻm, ngõ",
-    owner: "Ms Trang",
-    price: "900000000",
-    address: "Quận 7, TPHCM",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 15,
-    type: "Đất thổ cư",
-    owner: "Ms Thuy",
-    price: "1300000000",
-    address: "Quận 7, TPHCM",
-    license: "Sổ hồng",
-  },
-];
-
-function deleteProject(project) {
-  console.log(project);
+function deleteProject(house) {
+  console.log(house);
   // axios
-  //   .post(URLCollection.removeProject, project)
+  //   .post(URLCollection.removeProject, house)
   //   .then((res) => res.data)
   //   .catch((err) => {
   //     console.error("Wasn't able to delete property.", err);
-  //     alert("Cannot delete! The project does not exist");
+  //     alert("Cannot delete! The house does not exist");
   //   });
 }
 
 export default function InfoTable() {
-  const [posts, setPosts] = useState(data);
+  const [posts, setPosts] = useState([]);
   const [tempPosts, setTempPosts] = useState([]);
   const [postsDel, setPostsDel] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
   const { lang, setLang } = useContext(langContext);
+  const [pageAmount, setPageAmount] = useState(0);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [houseOwner, setHouseOwner] = useState("");
+  const [houseCertificate, setHouseCertificate] = useState("");
+  const [houseType, setHouseType] = useState("");
+  const [houseTypeIncrease, setHouseTypeIncrease] = useState("");
+  const [houseAddress, setHouseAddress] = useState("");
 
   useEffect(() => {
     axios({
-      url: "http://127.0.0.1:8000/house/",
-      method: "GET"
+      url: URLs_Collection.getData.concat(
+        `page=${pageIndex}&house_type=${houseType}&house_certificate=${houseCertificate}&house_owner=${houseOwner}&house_type_increase=${houseTypeIncrease}&house_address=${houseAddress}`
+      ),
+      method: "GET",
     })
       .then((res) => {
         console.log(res);
-        setPosts(res.data);
-        setTempPosts(res.data);
+        setPosts(res.data.house_data);
+        setTempPosts(res.data.house_data);
+        setPageAmount(res.data.total_page);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [pageIndex]);
   console.log(posts);
   const pagePostsLimit = 8;
 
@@ -238,7 +124,7 @@ export default function InfoTable() {
 
   const checkedBoxCount = (post) => {
     const box = document.querySelectorAll(
-      ".project".concat(post.house_id.toString()).concat(" .form-check-input")
+      ".house".concat(post.house_id.toString()).concat(" .form-check-input")
     )[0];
     console.log(box);
     console.log(box.checked);
@@ -250,11 +136,12 @@ export default function InfoTable() {
   };
 
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * pagePostsLimit) % posts.length;
-    console.log(
-      `User requested page number ${event.selected}, which is offset ${newOffset}`
-    );
-    setItemOffset(newOffset);
+    // const newOffset = (event.selected * pagePostsLimit) % posts.length;
+    // console.log(
+    //   `User requested page number ${event.selected}, which is offset ${newOffset}`
+    // );
+    // setItemOffset(newOffset);
+    setPageIndex(event.selected + 1);
   };
 
   const switchArrow = () => {
@@ -413,7 +300,7 @@ export default function InfoTable() {
                     <td>
                       <Form>
                         <FormCheck
-                          className={"project".concat(post.house_id)}
+                          className={"house".concat(post.house_id)}
                           id={post.house_id}
                           onClick={() => {
                             checkedBoxCount(post);
@@ -455,9 +342,9 @@ export default function InfoTable() {
                   onClick={() => {
                     let ids = [];
                     alert("You want to delete these rows?");
-                    for (const project of postsDel) {
-                      ids.push(project.house_id);
-                      deleteProject(project);
+                    for (const house of postsDel) {
+                      ids.push(house.house_id);
+                      deleteProject(house);
                     }
                     removeElementsById(ids);
                   }}
@@ -480,7 +367,8 @@ export default function InfoTable() {
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           marginPagesDisplayed={2}
-          pageCount={Math.ceil(posts.length / pagePostsLimit)}
+          // pageCount={Math.ceil(posts.length / pagePostsLimit)}
+          pageCount={pageAmount}
           previousLabel={lang === en ? "< previous" : "< précédente"}
           pageClassName="page-item"
           pageLinkClassName="page-link"
