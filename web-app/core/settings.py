@@ -7,6 +7,7 @@ import os
 import environ
 from unipath import Path
 
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True)
@@ -90,18 +91,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-#pagination
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 8,
-}
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 if os.environ.get('DB_ENGINE') and os.environ.get('DB_ENGINE') == "mysql":
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': os.getenv('DB_NAME', 'appseed_db'),
             'USER': os.getenv('DB_USERNAME', 'appseed_db_usr'),
             'PASSWORD': os.getenv('DB_PASS', 'pass'),
@@ -120,6 +116,7 @@ else:
         'PORT': '5432'
     }  
     }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
