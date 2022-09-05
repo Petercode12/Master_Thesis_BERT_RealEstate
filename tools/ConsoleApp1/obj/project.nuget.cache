@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Fgnv8UXin++4AR0Y6Roi8xbDaGia2ILjjtLrV/pwyjE4VGaWJCJFi0VYVf4MjxToqviww2PMBp3P2z970TrBDA==",
+  "dgSpecHash": "wVd3Hib/IDrXEkKO7LsCL3JdwMUkCAfZTe8UYgWL74bpagJkUki0Kj/asPuSOWBy0XgiZkcfJUNm79x/ro+8uA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\phi.tran\\source\\repos\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+  "projectFilePath": "D:\\_git\\app-code\\tools\\ConsoleApp1\\ConsoleApp1.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.csharp\\4.0.1\\microsoft.csharp.4.0.1.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.0.1\\microsoft.netcore.platforms.1.0.1.nupkg.sha512",
