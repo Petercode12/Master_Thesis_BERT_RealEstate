@@ -8,144 +8,19 @@ import { langContext } from "../App.js";
 import en from "../lang/en.js";
 import Translate from "react-translate-component";
 
-const data = [
-  {
-    id: 1,
-    type: "Chung cư",
-    owner: "Ms Trinh",
-    price: "1400000000",
-    address:
-      "Đường Quốc Lộ 13, Phường Thuận Giao, Thành phố Thuận An, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 2,
-    type: "Chung cư",
-    owner: "minh an",
-    price: "200000000",
-    address: "Thành phố Thuận An, Bình Dương",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 3,
-    type: "Đất thổ cư",
-    owner: "nguyễn văn tịch",
-    price: "830000000",
-    address: "Đường Quốc Lộ 13, Xã Trừ Văn Thố, Huyện Bàu Bàng, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 4,
-    type: "Chung cư",
-    owner: "ngocnguyen.bds71@gmail.com",
-    price: "2640000000",
-    address:
-      "Đường Quốc Lộ 13, Phường Thuận Giao, Thành phố Thuận An, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 5,
-    type: "Nhà hẻm, ngõ",
-    owner: "HUỲNH GIAO",
-    price: "4500000",
-    address: "Đường dx140, Phường Tân An, Thành phố thủ Dầu Một, Bình Dương",
-    license: "Sổ hồng",
-  },
-  {
-    id: 6,
-    type: "Chung cư",
-    owner: "C Xoan",
-    price: "1450000000",
-    address: "Đường Quốc Lộ 13, Phường Thuận Giác",
-    license: "Sổ hồng",
-  },
-  {
-    id: 7,
-    type: "Nhà hẻm, ngõ",
-    owner: "Tan Phuoc",
-    price: "1800000000",
-    address: "Đường Quốc Lộ 1, Phường Thuận Giác",
-    license: "Sổ hồng",
-  },
-  {
-    id: 8,
-    type: "Đất thổ cư",
-    owner: "Manh Hung",
-    price: "1210000000",
-    address: "Đường Quốc Lộ 8, Phường Tân Bình",
-    license: "Sổ hồng",
-  },
-  {
-    id: 9,
-    type: "Nhà xưởng, nhà kho",
-    owner: "Mrs. Dung",
-    price: "1400000000",
-    address: "Đường Quốc Lộ 13, Phường Bình Tân",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 10,
-    type: "Đất thổ cư",
-    owner: "Mrs. Phụng",
-    price: "1200000000",
-    address: "Xa lộ hà nội, TPHCM",
-    license: "Sổ hồng",
-  },
-  {
-    id: 11,
-    type: "Nhà xưởng, nhà kho",
-    owner: "Mr Khoi",
-    price: "1800000000",
-    address: "Phường Hòa Bình, Biên Hòa",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 12,
-    type: "Đất thổ cư",
-    owner: "Mr. Phan",
-    price: "1100000000",
-    address: "Phường Thanh Bình, Biên Hòa",
-    license: "Sổ hồng",
-  },
-  {
-    id: 13,
-    type: "Đất thổ cư",
-    owner: "Ms Loc",
-    price: "1200000000",
-    address: "Quận 10, TPHCM",
-    license: "Sổ hồng",
-  },
-  {
-    id: 14,
-    type: "Nhà hẻm, ngõ",
-    owner: "Ms Trang",
-    price: "900000000",
-    address: "Quận 7, TPHCM",
-    license: "Hợp đồng mua bán",
-  },
-  {
-    id: 15,
-    type: "Đất thổ cư",
-    owner: "Ms Thuy",
-    price: "1300000000",
-    address: "Quận 7, TPHCM",
-    license: "Sổ hồng",
-  },
-];
-
-function deleteProject(project) {
-  console.log(project);
+function deleteProject(house) {
+  console.log(house);
   // axios
-  //   .post(URLCollection.removeProject, project)
+  //   .post(URLCollection.removeProject, house)
   //   .then((res) => res.data)
   //   .catch((err) => {
   //     console.error("Wasn't able to delete property.", err);
-  //     alert("Cannot delete! The project does not exist");
+  //     alert("Cannot delete! The house does not exist");
   //   });
 }
 
 export default function InfoTable() {
-  const [posts, setPosts] = useState(data);
+  const [posts, setPosts] = useState([]);
   const [tempPosts, setTempPosts] = useState([]);
   const [postsDel, setPostsDel] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
@@ -154,7 +29,7 @@ export default function InfoTable() {
   useEffect(() => {
     axios({
       url: "http://127.0.0.1:8000/house/",
-      method: "GET"
+      method: "GET",
     })
       .then((res) => {
         console.log(res);
@@ -168,25 +43,7 @@ export default function InfoTable() {
   console.log(posts);
   const pagePostsLimit = 8;
 
-  const handleFilterByType = () => {
-    const filterElementValue = document.getElementById("filterByType").value;
-    if (filterElementValue !== "select type") {
-      const filtered = posts.filter(
-        (post) => post.LoaiHinh === filterElementValue
-      );
-      setPosts(filtered);
-    }
-  };
-
-  const handleFilterByLicense = () => {
-    const filterElementValue = document.getElementById("filterByLicense").value;
-    if (filterElementValue !== "select license") {
-      const filtered = posts.filter(
-        (post) => post.ChungNhanSoHuu === filterElementValue
-      );
-      setPosts(filtered);
-    }
-  };
+  // Delete rows functions
   const removeElementById = (id) => {
     const postsAfterRemove = posts.filter((post) => post.house_id !== id);
     setPosts(postsAfterRemove);
@@ -216,29 +73,101 @@ export default function InfoTable() {
     );
   };
 
-  const searchHouseByOwner = () => {
+  // Filter functions
+  const handleFilter = () => {
+    let filteredPosts = posts;
+    const filterByTypeElementValue =
+      document.getElementById("filterByType").value;
+    const filterByLicenseElementValue =
+      document.getElementById("filterByLicense").value;
     const owner = document.getElementById("filterByName").value;
-    if (owner !== "") {
-      const filteredPosts = posts.filter((post) =>
-        post.TacGia.toLowerCase().includes(owner.toLowerCase())
-      );
-      setPosts(filteredPosts);
-    }
-  };
-
-  const searchHouseByAddress = () => {
     const address = document.getElementById("filterByAddress").value;
-    if (address !== "") {
-      const filteredPosts = posts.filter((post) =>
-        post.DiaChi.toLowerCase().includes(address.toLowerCase())
-      );
-      setPosts(filteredPosts);
+    if (filterByTypeElementValue !== "select type" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.LoaiHinh !== null) {
+          return post.LoaiHinh.toLowerCase().includes(
+            filterByTypeElementValue.toLowerCase()
+          );
+        }
+        return false;
+      });
     }
+    if (
+      filterByLicenseElementValue !== "select license" &&
+      filteredPosts !== null
+    ) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.ChungNhanSoHuu !== null) {
+          return post.ChungNhanSoHuu.toLowerCase().includes(
+            filterByLicenseElementValue.toLowerCase()
+          );
+        }
+        return false;
+      });
+    }
+    if (owner !== "" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.TacGia !== null) {
+          return post.TacGia.toLowerCase().includes(owner.toLowerCase());
+        }
+        return false;
+      });
+    }
+    if (address !== "" && filteredPosts !== null) {
+      filteredPosts = filteredPosts.filter((post) => {
+        if (post.DiaChi !== null) {
+          return post.DiaChi.toLowerCase().includes(address.toLowerCase());
+        }
+        return false;
+      });
+    }
+    setPosts(filteredPosts);
   };
+  // const handleFilterByType = () => {
+  //   const filterElementValue = document.getElementById("filterByType").value;
+  //   if (filterElementValue !== "select type") {
+  //     const filtered = posts.filter((post) =>
+  //       post.LoaiHinh.toLowerCase().includes(filterElementValue.toLowerCase())
+  //     );
+  //     setPosts(filtered);
+  //   }
+  // };
 
+  // const handleFilterByLicense = () => {
+  //   const filterElementValue = document.getElementById("filterByLicense").value;
+  //   if (filterElementValue !== "select license") {
+  //     const filtered = posts.filter((post) =>
+  //       post.ChungNhanSoHuu.toLowerCase().includes(
+  //         filterElementValue.toLowerCase()
+  //       )
+  //     );
+  //     setPosts(filtered);
+  //   }
+  // };
+  // const searchHouseByOwner = () => {
+  //   const owner = document.getElementById("filterByName").value;
+  //   if (owner !== "") {
+  //     const filteredPosts = posts.filter((post) =>
+  //       post.TacGia.toLowerCase().includes(owner.toLowerCase())
+  //     );
+  //     setPosts(filteredPosts);
+  //   }
+  // };
+
+  // const searchHouseByAddress = () => {
+  //   const address = document.getElementById("filterByAddress").value;
+  //   if (address !== "") {
+  //     const filteredPosts = posts.filter((post) =>
+  //       post.DiaChi.toLowerCase().includes(address.toLowerCase())
+  //     );
+  //     setPosts(filteredPosts);
+  //   }
+  // };
+
+  // Extra functions for handling features
   const checkedBoxCount = (post) => {
     const box = document.querySelectorAll(
-      ".project".concat(post.house_id.toString()).concat(" .form-check-input")
+      ".house".concat(post.house_id.toString()).concat(" .form-check-input")
     )[0];
     console.log(box);
     console.log(box.checked);
@@ -318,10 +247,11 @@ export default function InfoTable() {
               id="searchBtn"
               value={lang === en ? "Search" : "Rechercher un projet"}
               onClick={() => {
-                searchHouseByOwner();
-                searchHouseByAddress();
-                handleFilterByType();
-                handleFilterByLicense();
+                handleFilter();
+                // searchHouseByOwner();
+                // searchHouseByAddress();
+                // handleFilterByType();
+                // handleFilterByLicense();
               }}
             ></Button>
             <Button
@@ -413,7 +343,7 @@ export default function InfoTable() {
                     <td>
                       <Form>
                         <FormCheck
-                          className={"project".concat(post.house_id)}
+                          className={"house".concat(post.house_id)}
                           id={post.house_id}
                           onClick={() => {
                             checkedBoxCount(post);
@@ -455,9 +385,9 @@ export default function InfoTable() {
                   onClick={() => {
                     let ids = [];
                     alert("You want to delete these rows?");
-                    for (const project of postsDel) {
-                      ids.push(project.house_id);
-                      deleteProject(project);
+                    for (const house of postsDel) {
+                      ids.push(house.house_id);
+                      deleteProject(house);
                     }
                     removeElementsById(ids);
                   }}
