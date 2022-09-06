@@ -7,7 +7,6 @@ import ReactPaginate from "react-paginate";
 import { langContext } from "../App.js";
 import en from "../lang/en.js";
 import Translate from "react-translate-component";
-import URLs_Collection from "../Helper/URLs_Collection";
 
 function deleteProject(house) {
   console.log(house);
@@ -26,13 +25,6 @@ export default function InfoTable() {
   const [postsDel, setPostsDel] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
   const { lang, setLang } = useContext(langContext);
-  const [pageAmount, setPageAmount] = useState(0);
-  const [pageIndex, setPageIndex] = useState(1);
-  const [houseOwner, setHouseOwner] = useState("");
-  const [houseCertificate, setHouseCertificate] = useState("");
-  const [houseType, setHouseType] = useState("");
-  const [houseTypeIncrease, setHouseTypeIncrease] = useState("");
-  const [houseAddress, setHouseAddress] = useState("");
 
   useEffect(() => {
     axios({
@@ -41,14 +33,13 @@ export default function InfoTable() {
     })
       .then((res) => {
         console.log(res);
-        setPosts(res.data.house_data);
-        setTempPosts(res.data.house_data);
-        setPageAmount(res.data.total_page);
+        setPosts(res.data);
+        setTempPosts(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [pageIndex]);
+  }, []);
   console.log(posts);
   const pagePostsLimit = 8;
 
@@ -132,46 +123,6 @@ export default function InfoTable() {
     }
     setPosts(filteredPosts);
   };
-  // const handleFilterByType = () => {
-  //   const filterElementValue = document.getElementById("filterByType").value;
-  //   if (filterElementValue !== "select type") {
-  //     const filtered = posts.filter((post) =>
-  //       post.LoaiHinh.toLowerCase().includes(filterElementValue.toLowerCase())
-  //     );
-  //     setPosts(filtered);
-  //   }
-  // };
-
-  // const handleFilterByLicense = () => {
-  //   const filterElementValue = document.getElementById("filterByLicense").value;
-  //   if (filterElementValue !== "select license") {
-  //     const filtered = posts.filter((post) =>
-  //       post.ChungNhanSoHuu.toLowerCase().includes(
-  //         filterElementValue.toLowerCase()
-  //       )
-  //     );
-  //     setPosts(filtered);
-  //   }
-  // };
-  // const searchHouseByOwner = () => {
-  //   const owner = document.getElementById("filterByName").value;
-  //   if (owner !== "") {
-  //     const filteredPosts = posts.filter((post) =>
-  //       post.TacGia.toLowerCase().includes(owner.toLowerCase())
-  //     );
-  //     setPosts(filteredPosts);
-  //   }
-  // };
-
-  // const searchHouseByAddress = () => {
-  //   const address = document.getElementById("filterByAddress").value;
-  //   if (address !== "") {
-  //     const filteredPosts = posts.filter((post) =>
-  //       post.DiaChi.toLowerCase().includes(address.toLowerCase())
-  //     );
-  //     setPosts(filteredPosts);
-  //   }
-  // };
 
   // Extra functions for handling features
   const checkedBoxCount = (post) => {
@@ -188,12 +139,11 @@ export default function InfoTable() {
   };
 
   const handlePageClick = (event) => {
-    // const newOffset = (event.selected * pagePostsLimit) % posts.length;
-    // console.log(
-    //   `User requested page number ${event.selected}, which is offset ${newOffset}`
-    // );
-    // setItemOffset(newOffset);
-    setPageIndex(event.selected + 1);
+    const newOffset = (event.selected * pagePostsLimit) % posts.length;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
   };
 
   const switchArrow = () => {
@@ -273,7 +223,7 @@ export default function InfoTable() {
                 lang === en ? "Reset Search" : "Réinitialiser la recherche"
               }
               onClick={() => {
-                window.location.reload();
+                // window.location.reload();
                 setPosts(tempPosts);
               }}
             ></Button>
@@ -420,8 +370,7 @@ export default function InfoTable() {
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           marginPagesDisplayed={2}
-          // pageCount={Math.ceil(posts.length / pagePostsLimit)}
-          pageCount={pageAmount}
+          pageCount={Math.ceil(posts.length / pagePostsLimit)}
           previousLabel={lang === en ? "< previous" : "< précédente"}
           pageClassName="page-item"
           pageLinkClassName="page-link"
