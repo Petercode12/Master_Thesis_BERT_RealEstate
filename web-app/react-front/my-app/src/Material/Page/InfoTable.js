@@ -9,14 +9,22 @@ import en from "../lang/en.js";
 import Translate from "react-translate-component";
 
 function deleteProject(house) {
-  console.log(house);
-  // axios
-  //   .post(URLCollection.removeProject, house)
-  //   .then((res) => res.data)
-  //   .catch((err) => {
-  //     console.error("Wasn't able to delete property.", err);
-  //     alert("Cannot delete! The house does not exist");
-  //   });
+  // console.log(house);
+
+  const delete_content = {
+    id: house.house_id
+  }
+  console.log(delete_content);
+  axios({
+    url: "http://127.0.0.1:8000/delete/house",
+    method: "POST",
+    params: delete_content,
+  })
+    .then((res) => { console.log(res); })
+    .catch((err) => {
+      console.error("Wasn't able to delete property.", err);
+      alert("Cannot delete! The house does not exist");
+    });
 }
 
 export default function InfoTable() {
@@ -75,7 +83,7 @@ export default function InfoTable() {
 
   // Filter functions
   const handleFilter = () => {
-    let filteredPosts = posts;
+    let filteredPosts = tempPosts;
     const filterByTypeElementValue =
       document.getElementById("filterByType").value;
     const filterByLicenseElementValue =

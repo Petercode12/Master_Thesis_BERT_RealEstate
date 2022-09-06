@@ -18,8 +18,9 @@ def houseApi(request):
         houses_serializer = HouseSerializer(houses, many=True)
         return JsonResponse(houses_serializer.data, safe=False)
 @csrf_exempt
-def delete_house(request, id):
+def delete_house(request):
     if request.method == "POST":
+        id = request.GET.get('id')
         if id is not None and id != "": 
             print(id)
             connection = psycopg2.connect(
@@ -40,10 +41,5 @@ def delete_house(request, id):
             cursor.execute(delete_record_muaban)
             connection.commit()
             connection.close()
-            houses = Houses.objects.filter(house_id = id)
-            if houses:
-                houses.delete()    
-            else: 
-                return HttpResponse(status = 404)
             return HttpResponse(status = 200)
     return HttpResponse(status = 400)
