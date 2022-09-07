@@ -173,7 +173,7 @@ class DatasetProcessor(object):
         
         input_ids = [self.encode_sentence(txt, True) for txt in self.__raw_sentences]
         
-        tags = [[self.__tag2idx.get(t) for _, t in sentence] for sentence in self.__sentences]
+        tags = [[self.__tag2idx.get(t) if self.__tag2idx.get(t) is not None else 0 for _, t in sentence] for sentence in self.__sentences]
         for idx, ts in enumerate(tags):
             ts.insert(0, self.__tag2idx['O'])
             ts.append(self.__tag2idx['O'])
