@@ -232,8 +232,19 @@ export default function Chart() {
     },
   };
 
+  let labelsForState3 = {};
+  for (const post of posts) {
+    if (!labelsForState3.hasOwnProperty(post["LoaiHinh"])) {
+      labelsForState3 = { ...labelsForState3, [post["LoaiHinh"]]: 1 };
+    } else {
+      labelsForState3[post["LoaiHinh"]] += 1;
+    }
+  }
+  let labelsList = Object.keys(labelsForState3);
+  let valuesList = Object.values(labelsForState3);
+
   const state3 = {
-    series: [44, 55, 13, 43, 22],
+    series: valuesList,
     options: {
       chart: {
         width: 380,
@@ -243,7 +254,7 @@ export default function Chart() {
         text: "Pie Chart",
         align: "left",
       },
-      labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
+      labels: labelsList,
       responsive: [
         {
           breakpoint: 480,
