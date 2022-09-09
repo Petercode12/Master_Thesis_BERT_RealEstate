@@ -1,5 +1,5 @@
-download this file and extract to bertapi folder 
-http://113.182.189.199/packages/libs-bertapi.zip
+## download this file and extract to folder web-app/house/bertapi
+## http://113.182.189.199/packages/libs-bertapi.zip
 
 
 
