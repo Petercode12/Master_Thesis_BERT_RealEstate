@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -10,6 +11,19 @@ from house.serializers import HouseSerializer
 from django.http import HttpResponse
 import os
 import psycopg2
+from .bertapi.apibert import *
+
+
+@csrf_exempt
+def extract_sentence(request):
+    if request.method == "POST":
+        sentence = request.POST['sentence']
+        
+        print(sentence)
+        if sentence is not None and sentence != "": 
+            result = extractSentence(sentence)
+            return JsonResponse( json.loads(result), safe=False)
+
 @csrf_exempt
 def houseApi(request):
     if request.method == 'GET':
