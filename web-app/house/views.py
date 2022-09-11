@@ -34,14 +34,14 @@ def get_sentence(request):
             response['result_sentence'] = json.loads(sentence[0].result_sentence)
             return JsonResponse(response)
 
-@csrf_exempt
-def extract_sentence(request):
-    if request.method == "POST":
-        sentence = request.POST['sentence']
-        print(sentence)
-        if sentence is not None and sentence != "": 
-            result = extractSentenceApi(sentence)
-            return JsonResponse( json.loads(result), safe=False)
+# @csrf_exempt
+# def extract_sentence(request):
+#     if request.method == "POST":
+#         sentence = request.POST['sentence']
+#         print(sentence)
+#         if sentence is not None and sentence != "": 
+#             result = extractSentenceApi(sentence)
+#             return JsonResponse( json.loads(result), safe=False)
 
 @csrf_exempt
 def houseApi(request):
