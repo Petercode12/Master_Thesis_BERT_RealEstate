@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from house.models import Houses
+from house.models import *
 
 
 class HouseSerializer (serializers.ModelSerializer):
@@ -12,4 +12,12 @@ class HouseSerializer (serializers.ModelSerializer):
                   'Gia',
                   'DienTich',
                   'DiaChi',
-                  'ChungNhanSoHuu')
+                  'ChungNhanSoHuu',
+                  'Description')
+        
+class SentenceSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Extractsentence
+        fields = ('id',
+                  'org_id',
+                  'result_sentence')        

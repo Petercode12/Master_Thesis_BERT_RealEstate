@@ -4,6 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 import csv
 import sqlite3
+from statistics import mode
 from django.db import models
 
 # Create your models here.
@@ -20,3 +21,10 @@ class Houses(models.Model):
     DienTich = models.CharField(max_length=200, null=True, blank=True)
     DiaChi = models.CharField(max_length=200, blank=True)
     ChungNhanSoHuu = models.CharField(max_length=200, null=True, blank=True)
+    Description = models.TextField(null=True)
+
+
+class Extractsentence(models.Model):
+    id = models.AutoField(primary_key=True)
+    org_id = models.IntegerField(default=0)
+    result_sentence = models.TextField(null=True)

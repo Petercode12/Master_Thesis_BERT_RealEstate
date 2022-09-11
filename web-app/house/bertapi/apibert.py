@@ -1,7 +1,7 @@
 import os
 from .utils import DatasetProcessor, PhoBERT
 
-def extractSentence(text):
+def extractSentenceApi(text):
     processor = DatasetProcessor()
     processor.load_tags()
     # 

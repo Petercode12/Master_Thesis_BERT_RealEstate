@@ -78,7 +78,7 @@ print(len(sentences[i]))
 print(torch.max(torch.tensor(ids)))
 
 # batch size
-bs = 4  # changed from 32 to 4
+bs = 32  # changed from 32 to 4
 tag_values = processor.get_tags()
 tag_values
 

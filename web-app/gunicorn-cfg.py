@@ -9,3 +9,5 @@ accesslog = '-'
 loglevel = 'debug'
 capture_output = True
 enable_stdio_inheritance = True
+timeout = 160
+graceful_timeout = 160
