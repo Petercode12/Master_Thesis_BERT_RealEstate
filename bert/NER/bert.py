@@ -78,7 +78,7 @@ print(len(sentences[i]))
 print(torch.max(torch.tensor(ids)))
 
 # batch size
-bs = 4  # changed from 32 to 4
+bs = 32  # changed from 32 to 4
 tag_values = processor.get_tags()
 tag_values
 
@@ -124,7 +124,7 @@ bert = PhoBERT(labels=processor.get_tags(),
   pretrained_model_path='NER/PhoBERT_base_transformers/model.bin')
 
 loss_values, validation_loss_values,  accuracy_values, validation_accuracy_values, f1_score_values, validation_f1_score_values = bert.train(
-    train_dataloader, valid_dataloader, learning_rate=3e-5, eps=1e-8, max_grad_norm=1.0, epochs=1)
+    train_dataloader, valid_dataloader, learning_rate=3e-5, eps=1e-8, max_grad_norm=1.0, epochs=50)
 
 # Plot the learning curve.
 plt.plot(loss_values, 'b-o', label="training loss")
@@ -188,5 +188,5 @@ test_sentence = "Chính chủ cần bán nhà mặt tiền đường Lý Thái T
 contents, labels = bert.predict_sentence(test_sentence)
 
 print('prediction result')
-for content, label in zip(contents, labels):
+for content, label in zip(  contents, labels):
   print("{}\t{}".format(content, label))
