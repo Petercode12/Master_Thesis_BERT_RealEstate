@@ -1,12 +1,12 @@
 import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
+from django.core import serializers as core_serializers
 # Create your views here.
 
-from house.models import Houses
-from house.serializers import HouseSerializer
+from house.models import *
+from house.serializers import *
 
 from django.http import HttpResponse
 import os
@@ -15,14 +15,33 @@ from .bertapi.apibert import *
 
 
 @csrf_exempt
-def extract_sentence(request):
-    if request.method == "POST":
-        sentence = request.POST['sentence']
-        
-        print(sentence)
-        if sentence is not None and sentence != "": 
-            result = extractSentence(sentence)
-            return JsonResponse( json.loads(result), safe=False)
+def get_sentence(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        if id is not None and id != "": 
+            print(id)
+            sentence = Extractsentence.objects.filter(org_id=id)
+            house = Houses.objects.filter(house_id=id)[0]
+            response = {}
+            if len(sentence) == 0:
+                print(house.Description)
+                result = extractSentenceApi(house.Description)
+                Extractsentence.objects.create(org_id=id,result_sentence=result)
+                response['house'] =json.loads(core_serializers.serialize("json", [house]))
+                response['result_sentence'] = json.loads(result)
+                return JsonResponse(response)
+            response['house'] = json.loads(core_serializers.serialize("json", [house]))
+            response['result_sentence'] = json.loads(sentence[0].result_sentence)
+            return JsonResponse(response)
+
+# @csrf_exempt
+# def extract_sentence(request):
+#     if request.method == "POST":
+#         sentence = request.POST['sentence']
+#         print(sentence)
+#         if sentence is not None and sentence != "": 
+#             result = extractSentenceApi(sentence)
+#             return JsonResponse( json.loads(result), safe=False)
 
 @csrf_exempt
 def houseApi(request):
@@ -31,6 +50,8 @@ def houseApi(request):
         houses = Houses.objects.all()
         houses_serializer = HouseSerializer(houses, many=True)
         return JsonResponse(houses_serializer.data, safe=False)
+    
+
 @csrf_exempt
 def delete_house(request):
     if request.method == "POST":

@@ -23,10 +23,10 @@ cursor = connection.cursor()
 # SQL query to insert data into the
 # House_house table
 delete_records = 'DELETE FROM house_houses'
-insert_records_ancu = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address FROM app_ancu_scraper a'
-insert_records_dangbannhadat = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address FROM app_dangbannhadat_scraper a WHERE a.type IS NOT NULL'
-insert_records_nhadat24h = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "ChungNhanSoHuu") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address, a.legal FROM app_nhadat24h_scraper a WHERE a.phone_number IS NOT NULL'
-insert_records_muaban = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "ChungNhanSoHuu") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.land_area ,a.address, a.legal FROM app_muabannet_scraper a'
+insert_records_ancu = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "Description") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address , a.description FROM app_ancu_scraper a'
+insert_records_dangbannhadat = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "Description") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address, a.description FROM app_dangbannhadat_scraper a WHERE a.type IS NOT NULL'
+insert_records_nhadat24h = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "ChungNhanSoHuu", "Description") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.area ,a.address, a.legal, a.description FROM app_nhadat24h_scraper a WHERE a.phone_number IS NOT NULL'
+insert_records_muaban = 'INSERT INTO house_houses (house_id, "LoaiHinh", "TacGia", "SoDienThoai", "Gia", "DienTich", "DiaChi", "ChungNhanSoHuu", "Description") SELECT a.id, a.type, a.post_author, a.phone_number, a.price_with_unit, a.land_area ,a.address, a.legal, a.description FROM app_muabannet_scraper a'
 
 # Importing the contents of the file
 # into our house table
