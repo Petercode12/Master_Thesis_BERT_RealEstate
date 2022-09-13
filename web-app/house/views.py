@@ -11,7 +11,19 @@ from house.serializers import *
 from django.http import HttpResponse
 import os
 import psycopg2
-from .bertapi.apibert import *
+
+from .bertapi.utils import DatasetProcessor, PhoBERT
+
+processor = DatasetProcessor()
+processor.load_tags()
+# 
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    
+bert = PhoBERT(labels=processor.get_tags(), 
+config_file_path=os.path.join(__location__,'bertapi','PhoBERT_base_transformers','config.json'),
+pretrained_model_path=os.path.join(__location__,'bertapi','PhoBERT_base_transformers','model.bin'))
+bert.load_model(filename=os.path.join(__location__,'bertapi','model-training','phobert'))
 
 
 @csrf_exempt
@@ -25,7 +37,16 @@ def get_sentence(request):
             response = {}
             if len(sentence) == 0:
                 print(house.Description)
-                result = extractSentenceApi(house.Description)
+                #result = extractSentenceApi(house.Description)
+                contents, labels = bert.predict_sentence(house.Description)
+                jsonResult = ''
+                start = 0
+                for content, label in zip(contents, labels):
+                    if start > 0 :
+                        jsonResult += ','
+                    jsonResult += f'{{"{label}": "{content}"}}'
+                    start += 1
+                result = f'[{jsonResult}]'
                 Extractsentence.objects.create(org_id=id,result_sentence=result)
                 response['house'] =json.loads(core_serializers.serialize("json", [house]))
                 response['result_sentence'] = json.loads(result)
