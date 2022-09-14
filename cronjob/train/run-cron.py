@@ -3,6 +3,9 @@ from utils import DatasetProcessor, PhoBERT
 
 import psycopg2
 
+
+
+
 processor = DatasetProcessor()
 processor.load_tags()
 # 
@@ -35,13 +38,13 @@ connection = psycopg2.connect(
 
 cursor = connection.cursor()   
 
-cursor.execute('SELECT house_id, "Description" FROM house_houses where house_id not in (select org_id from house_extractsentence) LIMIT 50 OFFSET 0')
+cursor.execute('SELECT house_id, "Description" FROM house_houses where house_id not in (select org_id from house_extractsentence) LIMIT 100 OFFSET 0')
 rows = cursor.fetchall()
-
+ind = 1
 for row in rows:
     org_id = row[0]
     description = row[1]
-    print(org_id)
+    print(f'Start {ind}: Id {org_id}')
     #result = extractSentenceApi(description)
 
     contents, labels = bert.predict_sentence(description)
@@ -50,11 +53,14 @@ for row in rows:
     for content, label in zip(contents, labels):
         if start > 0 :
             jsonResult += ','
-        jsonResult += f'{{"{label}": "{content}"}}'
+        rms = content.replace('"', '')
+        rms = rms.replace("'","")
+        jsonResult += f'{{"{label}": "{rms}"}}'
         start += 1
     result = f'[{jsonResult}]'
-    print(result)
+    #print(result)
     cursor.execute(f"INSERT INTO house_extractsentence (org_id, result_sentence) VALUES ({org_id}, '{result}')")
     connection.commit()
-    print("========================")
+    ind +=1
 connection.close()
+print("Done")
