@@ -9,18 +9,18 @@ import en from "../lang/en.js";
 import Translate from "react-translate-component";
 
 function deleteProject(house) {
-  // console.log(house);
-
   const delete_content = {
-    id: house.house_id
-  }
+    id: house.house_id,
+  };
   console.log(delete_content);
   axios({
     url: "http://127.0.0.1:8000/delete/house",
     method: "POST",
     params: delete_content,
   })
-    .then((res) => { console.log(res); })
+    .then((res) => {
+      console.log(res);
+    })
     .catch((err) => {
       console.error("Wasn't able to delete property.", err);
       alert("Cannot delete! The house does not exist");
@@ -60,8 +60,8 @@ export default function InfoTable() {
     const postsAfterRemove = posts.filter(
       (post) => !ids.includes(post.house_id)
     );
-    setPosts(postsAfterRemove);
     setPostsDel([]);
+    setPosts(postsAfterRemove);
   };
   const deleteBtn = (post) => {
     return (
@@ -216,10 +216,6 @@ export default function InfoTable() {
               value={lang === en ? "Search" : "Rechercher un projet"}
               onClick={() => {
                 handleFilter();
-                // searchHouseByOwner();
-                // searchHouseByAddress();
-                // handleFilterByType();
-                // handleFilterByLicense();
               }}
             ></Button>
             <Button
@@ -231,7 +227,6 @@ export default function InfoTable() {
                 lang === en ? "Reset Search" : "Réinitialiser la recherche"
               }
               onClick={() => {
-                // window.location.reload();
                 setPosts(tempPosts);
               }}
             ></Button>
@@ -270,6 +265,7 @@ export default function InfoTable() {
           <thead>
             <tr>
               <th> </th>
+              <th>ID</th>
               <th>
                 <Translate content="houseList.LoaiHinh" />{" "}
                 <button
@@ -320,10 +316,14 @@ export default function InfoTable() {
                       </Form>
                     </td>
                     <td>
-                      <Nav.Link href={`\\editProject\\${post.house_id}`}>
-                        {post.LoaiHinh}
+                      <Nav.Link
+                        style={{ color: "blue" }}
+                        href={`\\${post.house_id}`}
+                      >
+                        {post.house_id}
                       </Nav.Link>
                     </td>
+                    <td>{post.LoaiHinh}</td>
                     <td>{post.TacGia}</td>
                     <td>{post.SoDienThoai}</td>
                     <td>{post.DienTich}</td>
@@ -343,7 +343,7 @@ export default function InfoTable() {
                 {postsDel.length}{" "}
                 {lang === en ? "items selected" : "éléments sélectionnés"}
               </td>
-              <td colSpan="6" style={{ textAlign: "right", color: "red" }}>
+              <td colSpan="7" style={{ textAlign: "right", color: "red" }}>
                 <button
                   style={{
                     color: "red",

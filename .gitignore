@@ -37,3 +37,7 @@ node_modules
 
 postgres-data
 data
+web-app/house/bertapi/model-training/phobert
+web-app/house/bertapi/VnCoreNLP/
+web-app/house/bertapi/PhoBERT_base_transformers/model.bin
+web-app/house/bertapi/PhoBERT_base_transformers/bpe.codes

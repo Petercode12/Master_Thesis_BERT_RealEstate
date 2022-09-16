@@ -17,7 +17,7 @@ function Header() {
           <Col xl={6}>
             <p className="name">
               <Translate content="header.name" />
-              <Button
+              {/* <Button
                 style={{
                   color: "blue",
                   backgroundColor: "white",
@@ -38,7 +38,7 @@ function Header() {
                 }}
               >
                 EN |
-              </Button>
+              </Button> */}
             </p>
           </Col>
         </Row>
