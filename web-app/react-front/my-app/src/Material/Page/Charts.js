@@ -57,7 +57,7 @@ export default function Charts() {
   }
   const maxLength = Math.max(...valuesList) / 5; // Temporarily divide into 5 - origin: Not divide
   for (let i in jsonForLineChart) {
-    var meanValue = parseInt(
+    let meanValue = parseInt(
       jsonForLineChart[i].reduce(
         (a, b) => a + b / jsonForLineChart[i].length,
         0
