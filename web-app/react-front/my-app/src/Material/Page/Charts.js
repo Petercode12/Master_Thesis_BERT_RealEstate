@@ -95,7 +95,8 @@ export default function Charts() {
         height="400px"
         data={dataLineChart}
         options={{
-          title: "Độ biến động về diện tích của từng loại hình",
+          title:
+            "Độ biến động về diện tích của từng loại hình (Diện tích < 3000)",
           curveType: "function",
           legend: { position: "bottom" },
         }}
