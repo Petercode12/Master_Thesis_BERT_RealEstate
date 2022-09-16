@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { Nav } from "react-bootstrap";
+import { Nav, Table } from "react-bootstrap";
 function get_all_json_keys(json_object, ret_array = []) {
   for (const json_key in json_object) {
     if (
@@ -24,6 +24,30 @@ function get_all_json_keys(json_object, ret_array = []) {
   return ret_array;
 }
 
+const generateElement = (key,value) => {
+  return (
+    <tr>
+        <td>{key}</td>
+        <td>{value}</td>
+    </tr>
+  );
+}
+
+function generateData(data) {
+  const newData = Object.keys(data).reduce((result, currentKey) => {
+    if (typeof data[currentKey] === 'string' || data[currentKey] instanceof String) {
+      const elementToPush = generateElement(currentKey, data[currentKey]);
+      result.push(elementToPush);
+    } else {
+      const nested = generateData(data[currentKey]);
+      result.push(...nested);
+    }
+    return result;
+  }, []);
+  return newData;
+}
+
+
 export default function HouseDetail() {
   const [post, setPost] = useState({});
   const params = useParams();
@@ -44,6 +68,7 @@ export default function HouseDetail() {
   let all_keys = [];
   get_all_json_keys(post, all_keys);
   console.log("keys: ", all_keys);
+  console.log("data: ", post[all_keys]);
   return (
     <div>
       <Nav.Link href="/" className="back">
@@ -54,8 +79,38 @@ export default function HouseDetail() {
       <h2 style={{ marginTop: "0.5em" }}>
         Detail information of house with ID: {params.id}
       </h2>
-      <hr />
-      <pre>{JSON.stringify(post, null, "\t")}</pre>
+      {post.house ? 
+        <div>
+          <Table responsive striped bordered>
+            <tbody>
+              {post.house.map((h) => {
+                  return (
+                    <tr>
+                      <td><b>Raw data</b></td>
+                      <td>{h.fields.Description}</td>
+                  </tr>
+                  );
+                })}
+            </tbody>
+          </Table>
+        </div>
+        : null
+      }
+      {post.result_sentence ? 
+        <div>
+          <Table responsive striped bordered>
+            <thead>
+              <tr>
+                <th>Label</th> <th>Content</th>
+              </tr>
+            </thead>
+            <tbody>
+             {generateData(post.result_sentence)}
+            </tbody>
+          </Table>
+        </div>
+        : null
+      }
     </div>
   );
 }
