@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import "../Style/Chart.css";
+import "../Style/PopUpBox.css";
 import axios from "axios";
 import { Chart } from "react-google-charts";
 
 export default function Charts() {
   const [posts, setPosts] = useState([]);
+  const [loadingPopUp, setLoadingPopUp] = useState("block");
+
   useEffect(() => {
     axios({
       url: "http://127.0.0.1:8000/house/",
@@ -14,6 +17,7 @@ export default function Charts() {
       .then((res) => {
         console.log(res);
         setPosts(res.data);
+        setLoadingPopUp("none");
       })
       .catch((err) => {
         console.log(err);
@@ -101,6 +105,19 @@ export default function Charts() {
           legend: { position: "bottom" },
         }}
       />
+
+      <div className="overlay" style={{ display: loadingPopUp }}>
+        <div className="popup">
+          <h2>
+            Loading data{" "}
+            <i
+              style={{ marginLeft: "3px" }}
+              className="fa fa-spinner fa-spin"
+            ></i>
+          </h2>
+          <div className="content">Please wait a min!</div>
+        </div>
+      </div>
     </div>
   );
 }

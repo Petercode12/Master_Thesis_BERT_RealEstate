@@ -7,6 +7,7 @@ import ReactPaginate from "react-paginate";
 import { langContext } from "../App.js";
 import en from "../lang/en.js";
 import Translate from "react-translate-component";
+import "../Style/PopUpBox.css";
 
 function deleteProject(house) {
   const delete_content = {
@@ -33,6 +34,7 @@ export default function InfoTable() {
   const [postsDel, setPostsDel] = useState([]);
   const [itemOffset, setItemOffset] = useState(0);
   const { lang, setLang } = useContext(langContext);
+  const [loadingPopUp, setLoadingPopUp] = useState("block");
 
   useEffect(() => {
     axios({
@@ -41,6 +43,7 @@ export default function InfoTable() {
     })
       .then((res) => {
         console.log(res);
+        setLoadingPopUp("none");
         setPosts(res.data);
         setTempPosts(res.data);
       })
@@ -393,6 +396,18 @@ export default function InfoTable() {
           activeClassName="active"
           renderOnZeroPageCount={null}
         />
+      </div>
+      <div className="overlay" style={{ display: loadingPopUp }}>
+        <div className="popup">
+          <h2>
+            Loading data{" "}
+            <i
+              style={{ marginLeft: "3px" }}
+              className="fa fa-spinner fa-spin"
+            ></i>
+          </h2>
+          <div className="content">Please wait a min!</div>
+        </div>
       </div>
     </div>
   );
