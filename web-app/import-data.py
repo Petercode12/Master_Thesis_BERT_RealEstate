@@ -38,6 +38,7 @@ cursor.execute(insert_records_muaban)
 
 # cursor.execute(select_records)
 # Committing the changes
+
 connection.commit()
 
 # closing the database connection
