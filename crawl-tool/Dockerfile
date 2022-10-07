@@ -25,7 +25,7 @@ ENV PATH $CHROMEDRIVER_DIR:$PATH
 RUN apt-get update\
     && apt-get install cron\
     && service cron start\
-    && echo "PATH=/opt/someApp/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/chromedriver\n0 17 * * * DISPLAY=:0 . /code/jobs/management/commands/test.sh " | crontab -
+    && echo "PATH=/opt/someApp/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/chromedriver\n0 17 * * * DISPLAY=:0 . /code/jobs/management/commands/ancu.sh\n0 17 * * * DISPLAY=:0 . /code/jobs/management/commands/dangbannhadat.sh\n0 17 * * * DISPLAY=:0 . /code/jobs/management/commands/nhadat24h.sh " | crontab -
 
 RUN apt-get update && \
   apt-get install -y \
