@@ -18,6 +18,6 @@
   padding: 0 !important;
 }
 
-a span {
-  margin-left: 1em;
+div.navigation {
+  padding-left: 1em;
 }
