@@ -111,8 +111,6 @@ $ cd web-app
 $ virtualenv env
 $ source env/Scripts/activate
 $ pip install -r requirements.txt
-$ python -m pip install django-cors-headers
-$ pip install psycopg2
 ```
 
 <br />
