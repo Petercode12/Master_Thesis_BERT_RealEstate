@@ -22,12 +22,12 @@ class Navigation extends React.Component {
                     <Translate content="navigation.title" />
                   </p>
                 </Link>
-                <Link to="/insertData" style={{ textDecoration: "none" }}>
+                {/* <Link to="/insertData" style={{ textDecoration: "none" }}>
                   <p> Insert</p>
                 </Link>
                 <Link to="/chart" style={{ textDecoration: "none" }}>
                   <p> Chart</p>
-                </Link>
+                </Link> */}
               </Col>
             </Row>
           </Nav>

@@ -11,7 +11,7 @@ import "../Style/PopUpBox.css";
 
 function deleteProject(house) {
   const delete_content = {
-    id: house.house_id,
+    id: house[0],
   };
   console.log(delete_content);
   axios({
@@ -35,10 +35,12 @@ export default function InfoTable() {
   const [itemOffset, setItemOffset] = useState(0);
   const { lang, setLang } = useContext(langContext);
   const [loadingPopUp, setLoadingPopUp] = useState("block");
-
+  const [loadingPopUp2, setLoadingPopUp2] = useState("none");
+  const [logicalOperator, setLogicalOperator] = useState("AND");
+  const [queryTime, setQueryTime] = useState(0);
   useEffect(() => {
     axios({
-      url: "http://127.0.0.1:8000/house/",
+      url: "http://127.0.0.1:8000/getAllData/",
       method: "GET",
     })
       .then((res) => {
@@ -56,13 +58,11 @@ export default function InfoTable() {
 
   // Delete rows functions
   const removeElementById = (id) => {
-    const postsAfterRemove = posts.filter((post) => post.house_id !== id);
+    const postsAfterRemove = posts.filter((post) => post[0] !== id);
     setPosts(postsAfterRemove);
   };
   const removeElementsById = (ids) => {
-    const postsAfterRemove = posts.filter(
-      (post) => !ids.includes(post.house_id)
-    );
+    const postsAfterRemove = posts.filter((post) => !ids.includes(post[0]));
     setPostsDel([]);
     setPosts(postsAfterRemove);
   };
@@ -78,7 +78,7 @@ export default function InfoTable() {
         onClick={() => {
           alert("You want to delete this row?");
           deleteProject(post);
-          removeElementById(post.house_id);
+          removeElementById(post[0]);
         }}
       ></button>
     );
@@ -86,66 +86,57 @@ export default function InfoTable() {
 
   // Filter functions
   const handleFilter = () => {
-    let filteredPosts = tempPosts;
-    const filterByTypeElementValue =
-      document.getElementById("filterByType").value;
-    const filterByLicenseElementValue =
-      document.getElementById("filterByLicense").value;
-    const owner = document.getElementById("filterByName").value;
-    const address = document.getElementById("filterByAddress").value;
-    if (filterByTypeElementValue !== "select type" && filteredPosts !== null) {
-      filteredPosts = filteredPosts.filter((post) => {
-        if (post.LoaiHinh !== null) {
-          return post.LoaiHinh.toLowerCase().includes(
-            filterByTypeElementValue.toLowerCase()
-          );
-        }
-        return false;
+    setLoadingPopUp2("block");
+    const area = document.getElementById("searchByArea").value;
+    const compareArea = document.getElementById("compareArea").value;
+    const floors = document.getElementById("searchByFloors").value;
+    const compareFloors = document.getElementById("compareFloors").value;
+    const address = document.getElementById("searchByAddress").value;
+    const owner = document.getElementById("searchByOwner").value;
+    console.log("Area: ", area);
+    console.log("Compare Area: ", compareArea);
+    console.log("Floors: ", floors);
+    console.log("Compare Floors: ", compareFloors);
+    console.log("Address: ", address);
+    console.log("Owner: ", owner);
+    console.log("Operator: ", logicalOperator);
+    const search_content = {
+      area: area,
+      compareArea: compareArea,
+      floors: floors,
+      compareFloors: compareFloors,
+      address: address,
+      owner: owner,
+      logicalOperator: logicalOperator,
+    };
+    axios({
+      url: "http://127.0.0.1:8000/getSearchData/",
+      method: "POST",
+      params: search_content,
+    })
+      .then((res) => {
+        console.log("Res: ", res);
+        setLoadingPopUp2("none");
+        setQueryTime(res.data[res.data.length - 1]);
+        setPosts(res.data);
+      })
+      .catch((err) => {
+        console.error("Wasn't able to select records.", err);
+        alert("Cannot select records!");
       });
-    }
-    if (
-      filterByLicenseElementValue !== "select license" &&
-      filteredPosts !== null
-    ) {
-      filteredPosts = filteredPosts.filter((post) => {
-        if (post.ChungNhanSoHuu !== null) {
-          return post.ChungNhanSoHuu.toLowerCase().includes(
-            filterByLicenseElementValue.toLowerCase()
-          );
-        }
-        return false;
-      });
-    }
-    if (owner !== "" && filteredPosts !== null) {
-      filteredPosts = filteredPosts.filter((post) => {
-        if (post.TacGia !== null) {
-          return post.TacGia.toLowerCase().includes(owner.toLowerCase());
-        }
-        return false;
-      });
-    }
-    if (address !== "" && filteredPosts !== null) {
-      filteredPosts = filteredPosts.filter((post) => {
-        if (post.DiaChi !== null) {
-          return post.DiaChi.toLowerCase().includes(address.toLowerCase());
-        }
-        return false;
-      });
-    }
-    setPosts(filteredPosts);
   };
 
   // Extra functions for handling features
   const checkedBoxCount = (post) => {
     const box = document.querySelectorAll(
-      ".house".concat(post.house_id.toString()).concat(" .form-check-input")
+      ".house".concat(post[0].toString()).concat(" .form-check-input")
     )[0];
     console.log(box);
     console.log(box.checked);
     if (box.checked) {
       setPostsDel([...postsDel, post]);
     } else {
-      setPostsDel(postsDel.filter((p) => p.house_id !== post.house_id));
+      setPostsDel(postsDel.filter((p) => p[0] !== post[0]));
     }
   };
 
@@ -167,9 +158,9 @@ export default function InfoTable() {
     setPosts([
       ...posts.sort(function (a, b) {
         if (arrow.className === "fa fa-angle-up") {
-          return a.LoaiHinh.localeCompare(b.LoaiHinh);
+          return a[9].localeCompare(b[9]);
         } else {
-          return b.LoaiHinh.localeCompare(a.LoaiHinh);
+          return b[9].localeCompare(a[9]);
         }
       }),
     ]);
@@ -187,10 +178,8 @@ export default function InfoTable() {
             <Col sm="3">
               <Form.Control
                 type="text"
-                id="filterByName"
-                placeholder={
-                  lang === en ? "Chủ sở hữu" : "Numéro de projet, nom"
-                }
+                id="searchByArea"
+                placeholder={lang === en ? "Area" : "Numéro de projet, nom"}
                 style={{ marginTop: "4px" }}
               />
             </Col>
@@ -198,17 +187,18 @@ export default function InfoTable() {
               <Form.Control
                 type="text"
                 as="select"
-                id="filterByType"
+                id="compareArea"
                 defaultValue="select type"
                 style={{ marginTop: "4px" }}
               >
                 <option value="select type">
-                  {lang === en ? "Loại hình" : "L'état du projet"}
+                  {lang === en ? "Comparison" : "L'état du projet"}
                 </option>
-                <option value="Chung cư">Chung cư</option>
-                <option value="Đất thổ cư">Đất thổ cư</option>
-                <option value="Nhà hẻm, ngõ">Nhà hẻm, ngõ</option>
-                <option value="Nhà xưởng, nhà kho">Nhà xưởng, nhà kho</option>
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value="<=">&le;</option>
+                <option value=">=">&ge;</option>
+                <option value="=">&#61;</option>
               </Form.Control>
             </Col>
             <Button
@@ -230,7 +220,7 @@ export default function InfoTable() {
                 lang === en ? "Reset Search" : "Réinitialiser la recherche"
               }
               onClick={() => {
-                setPosts(tempPosts);
+                window.location.reload();
               }}
             ></Button>
           </Form.Group>
@@ -239,26 +229,73 @@ export default function InfoTable() {
             <Col sm="3">
               <Form.Control
                 type="text"
-                id="filterByAddress"
-                placeholder={lang === en ? "Địa chỉ" : "Numéro de projet, nom"}
+                id="searchByFloors"
+                placeholder={lang === en ? "Floors" : "Numéro de projet, nom"}
               />
             </Col>
             <Col sm="3">
               <Form.Control
                 type="text"
                 as="select"
-                id="filterByLicense"
+                id="compareFloors"
                 defaultValue="select license"
               >
                 <option value="select license">
-                  {lang === en ? "Chứng nhận sở hữu" : "L'état du projet"}
+                  {lang === en ? "Comparison" : "L'état du projet"}
                 </option>
-                <option value="Đang chờ sổ">Đang chờ sổ</option>
-                <option value="Hợp đồng mua bán">Hợp đồng mua bán</option>
-                <option value="Vi bằng">Vi bằng</option>
-                <option value="Có Sổ đỏ">Sổ đỏ</option>
-                <option value="Hợp đồng Góp vốn">Hợp đồng Góp vốn</option>
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value="<=">&le;</option>
+                <option value=">=">&ge;</option>
+                <option value="=">&#61;</option>
               </Form.Control>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-3">
+            <Col sm="3">
+              <Form.Control
+                type="text"
+                id="searchByAddress"
+                placeholder={lang === en ? "Address" : "Numéro de projet, nom"}
+              />
+            </Col>
+            <Col sm="3">
+              Logical Operators:
+              <Form.Check
+                inline
+                value="AND"
+                type="radio"
+                id="And"
+                name="radioGroup"
+                label="And"
+                onChange={() => {
+                  setLogicalOperator("AND");
+                }}
+                style={{ marginLeft: "10px" }}
+              />
+              <Form.Check
+                inline
+                value="OR"
+                type="radio"
+                id="Or"
+                name="radioGroup"
+                label="Or"
+                onChange={() => {
+                  setLogicalOperator("OR");
+                }}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-3">
+            <Col sm="3">
+              <Form.Control
+                type="text"
+                id="searchByOwner"
+                placeholder={lang === en ? "Owner" : "Numéro de projet, nom"}
+              />
+            </Col>
+            <Col sm="3">
+              <p>Query time: {queryTime} s</p>
             </Col>
           </Form.Group>
         </Form>
@@ -270,7 +307,7 @@ export default function InfoTable() {
               <th> </th>
               <th>ID</th>
               <th>
-                <Translate content="houseList.LoaiHinh" />{" "}
+                <Translate content="houseList.address" />{" "}
                 <button
                   className="fa fa-angle-up"
                   id="arrow"
@@ -279,22 +316,16 @@ export default function InfoTable() {
                 ></button>
               </th>
               <th>
-                <Translate content="houseList.TacGia" />
+                <Translate content="houseList.owner" />
               </th>
               <th>
-                <Translate content="houseList.SoDienThoai" />
+                <Translate content="houseList.unit_price" />
               </th>
               <th>
-                <Translate content="houseList.DienTich" />
+                <Translate content="houseList.area" />
               </th>
               <th>
-                <Translate content="houseList.Gia" />
-              </th>
-              <th>
-                <Translate content="houseList.DiaChi" />
-              </th>
-              <th>
-                <Translate content="houseList.ChungNhanSoHuu" />{" "}
+                <Translate content="houseList.floors" />
               </th>
               <th>
                 <Translate content="houseList.delete" />
@@ -306,12 +337,12 @@ export default function InfoTable() {
               .slice(itemOffset, itemOffset + pagePostsLimit)
               .map((post) => {
                 return (
-                  <tr key={post.house_id}>
+                  <tr key={post[0]}>
                     <td>
                       <Form>
                         <FormCheck
-                          className={"house".concat(post.house_id)}
-                          id={post.house_id}
+                          className={"house".concat(post[0])}
+                          id={post[0]}
                           onClick={() => {
                             checkedBoxCount(post);
                           }}
@@ -319,20 +350,15 @@ export default function InfoTable() {
                       </Form>
                     </td>
                     <td>
-                      <Nav.Link
-                        style={{ color: "blue" }}
-                        href={`\\${post.house_id}`}
-                      >
-                        {post.house_id}
+                      <Nav.Link style={{ color: "blue" }} href={`\\${post[0]}`}>
+                        {post[0]}
                       </Nav.Link>
                     </td>
-                    <td>{post.LoaiHinh}</td>
-                    <td>{post.TacGia}</td>
-                    <td>{post.SoDienThoai}</td>
-                    <td>{post.DienTich}</td>
-                    <td>{post.Gia}</td>
-                    <td>{post.DiaChi}</td>
-                    <td>{post.ChungNhanSoHuu}</td>
+                    <td>{post[9]}</td>
+                    <td>{post[2]}</td>
+                    <td>{post[4]}</td>
+                    <td>{post[10]}</td>
+                    <td>{post[7]}</td>
                     <td>{deleteBtn(post)}</td>
                   </tr>
                 );
@@ -357,7 +383,7 @@ export default function InfoTable() {
                     let ids = [];
                     alert("You want to delete these rows?");
                     for (const house of postsDel) {
-                      ids.push(house.house_id);
+                      ids.push(house[0]);
                       deleteProject(house);
                     }
                     removeElementsById(ids);
@@ -398,6 +424,18 @@ export default function InfoTable() {
         />
       </div>
       <div className="overlay" style={{ display: loadingPopUp }}>
+        <div className="popup">
+          <h2>
+            Loading data{" "}
+            <i
+              style={{ marginLeft: "3px" }}
+              className="fa fa-spinner fa-spin"
+            ></i>
+          </h2>
+          <div className="content">Please wait a min!</div>
+        </div>
+      </div>
+      <div className="overlay" style={{ display: loadingPopUp2 }}>
         <div className="popup">
           <h2>
             Loading data{" "}

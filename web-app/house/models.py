@@ -23,7 +23,6 @@ class Houses(models.Model):
     ChungNhanSoHuu = models.CharField(max_length=200, null=True, blank=True)
     Description = models.TextField(null=True)
 
-
 class Extractsentence(models.Model):
     id = models.AutoField(primary_key=True)
     org_id = models.IntegerField(default=0)

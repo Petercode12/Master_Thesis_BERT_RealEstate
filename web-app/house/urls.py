@@ -5,5 +5,7 @@ urlpatterns = [
     path('house/', views.houseApi, name="houseData"),
     path('delete/house', views.delete_house, name="delete-record-house"),
     # path('api/extract-sentence', views.extract_sentence, name="extract-sentence"),
-    path('api/get-sentence', views.get_sentence, name="get-sentence")
+    path('api/get-sentence', views.get_sentence, name="get-sentence"),
+    path('getAllData/',views.nha_dat_query_all,name="nhaDatData"),
+    path('getSearchData/',views.nha_dat_conditional_query ,name="nhaDatSearchData")
 ]

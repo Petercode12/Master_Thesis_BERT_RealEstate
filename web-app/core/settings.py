@@ -7,7 +7,6 @@ import os
 import environ
 from unipath import Path
 
-
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True)
@@ -97,12 +96,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 if os.environ.get('DB_ENGINE') and os.environ.get('DB_ENGINE') == "mysql":
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DB_NAME', 'appseed_db'),
-            'USER': os.getenv('DB_USERNAME', 'appseed_db_usr'),
-            'PASSWORD': os.getenv('DB_PASS', 'pass'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', 3306),
+            # 'ENGINE': 'django.db.backends.mysql', 
+            # 'NAME': os.getenv('DB_NAME', 'neon'),
+            # 'USER': os.getenv('DB_USERNAME', 'root'),
+            # 'PASSWORD': os.getenv('DB_PASS', 'Pphuoc925193'),
+            # 'HOST': os.getenv('DB_HOST', 'localhost'),
+            # 'PORT': os.getenv('DB_PORT', 3306),
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',  
+            'NAME': 'neon',  
+            'USER': 'root',  
+            'PASSWORD': 'Pphuoc925193',  
+            'HOST': 'localhost',  
+            'PORT': '3306'
         },
     }
 else:
@@ -115,6 +120,16 @@ else:
         'HOST': '129.146.248.20',  
         'PORT': '5432'
     }  
+        # "default": {
+        #     "ENGINE": "mssql",
+        #     "NAME": "DJANGO_MSSQL",
+        #     "USER": "sa",
+        #     "PASSWORD": "ABCD",
+        #     "HOST": "TANPHUOC",
+        #     "PORT": "",
+        #     "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
+        #     },
+        # },
     }
 
 
